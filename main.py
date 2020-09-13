@@ -1,3 +1,5 @@
-import toolbox_02450
+import pandas as pd
 
-print("test")
+data = pd.read_csv("heart.csv")
+
+print(data)
