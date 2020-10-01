@@ -70,15 +70,20 @@ show()
 
 # Seems like age, chol and thalach are normally distributed
 
-# Boxplots: 
+# 
 
-boxplot(X)
-xticks(range(1,9),attributeNames)
-title('Data Set on Heart Attack Possibility - boxplot')
+# Boxplots: only for continuous data, excluding age
+
+X_cont = np.column_stack((X[:,3],X[:,4],X[:,5]))
+
+attributeNames_cont = np.array([attributeNames[3],attributeNames[4],attributeNames[5]])
+
+boxplot(X_cont)
+xticks(range(1,3),attributeNames_cont)
+title('Boxplot for continuous values')
 show()
 
 '''
-Boxplots are inequal: X should go through feature transformation.
 It can clearly be seen that tje continuous variables are at different scales
 (e.g.: cholesterol is between 100-400 whereas olpeak is from 0 to 6)
 This will be a problem for applying ML algorithms, 
@@ -93,33 +98,21 @@ later - for making a better model - for example we could use bining but this is 
 of this project.
 
 '''
-X_col_tonorm = np.column_stack((X[:,3],X[:,4],X[:,5]))
 
-Y2_col = X_col_tonorm - np.ones((N, 1))*X_col_tonorm.mean(0)
-Y2_col = Y2_col*(1/np.std(Y2_col,0))
 
-# Add columns in the matrix:
-Y2 = X
-Y2[:,3] = Y2_col[:,0]
-Y2[:,4] = Y2_col[:,1]
-Y2[:,5] = Y2_col[:,2]
-
-# and we remove the age column:
-Y2 = np.delete(Y2,0,1)    
+Y2 = X_cont - np.ones((N, 1))*X_cont.mean(0)
+Y2 = Y2*(1/np.std(Y2,0))
 
 # We do the boxplot again: 
 boxplot(Y2)
-attributeNames_boxplot = np.delete(attributeNames,0)
-xticks(range(1,8),attributeNames_boxplot)
-title('H.A.P. - Boxplot for Standardized Values')
+xticks(range(1,3),attributeNames_cont)
+title('Boxplot for Standardized Continuous Values')
 show()
 
 # Looks better now. We should discuss which outliers to remove
 
-# Make a boxplot based on each class: high risk/ low risk of heart attack
+# Boxplot based on each class: more chance/ less chance of heart attack
 # Also align them on the same axis for better comparison
-
-
 
 figure(figsize=(14,7))
 for c in range(C):
@@ -127,12 +120,18 @@ for c in range(C):
     class_mask = (y==c)     
     boxplot(Y2[class_mask,:])
     #title('Class: {0}'.format(classNames[c]))
-    title('Class: '+classNames[c])
-    xticks(range(1,len(attributeNames)+1), [a[:7] for a in attributeNames], rotation=45)
+    title('Boxplot for Class: '+classNames[c])
+    xticks(range(1,len(attributeNames_cont)+1), [a[:7] for a in attributeNames_cont], rotation=45)
     y_up = Y2.max()+(Y2.max()-Y2.min())*0.1; y_down = Y2.min()-(Y2.max()-Y2.min())*0.1
     ylim(y_down, y_up)
 
 show()
+
+# Replace standardized columns into X
+X_stand = X
+X_stand[:,3] = Y2[:,0]
+X_stand[:,3] = Y2[:,1]
+X_stand[:,3] = Y2[:,2]
 
 
 
