@@ -36,7 +36,16 @@ attributeNames = np.delete(attributeNames, -1)
 # define class labels based on target
 # 0 - low chance of getting heart attack
 # 1 - high chance of getting heart attack
-classLabels = data[:,-1]
+
+classLabels_float = data[:,-1]
+#replace class labels with "Less Chance for Heart Attack" = 0 and "More Chance for Heart Attack 
+classLabels = np.empty(classLabels_float.size, dtype=object) 
+for i in range(classLabels.size):
+    if (classLabels_float[i] == 0):
+        classLabels[i] = "Less Chance for Heart Attack"
+    else:
+        classLabels[i] = "More Chance for Heart Attack"
+
 classNames = np.unique(classLabels)
 classDict = dict(zip(classNames,range(len(classNames))))
 y = np.array([classDict[cl] for cl in classLabels])    
@@ -110,6 +119,8 @@ show()
 # Make a boxplot based on each class: high risk/ low risk of heart attack
 # Also align them on the same axis for better comparison
 
+
+
 figure(figsize=(14,7))
 for c in range(C):
     subplot(1,C,c+1)
@@ -122,6 +133,7 @@ for c in range(C):
     ylim(y_down, y_up)
 
 show()
+
 
 
     
