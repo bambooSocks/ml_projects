@@ -4,10 +4,10 @@ from main import *
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import (yticks, plot, boxplot, xticks, ylabel, title, 
-                               figure, subplot, hist, xlabel, ylim, show, legend)
-import xlrd
+from matplotlib.pyplot import (yticks, plot, boxplot, xticks, ylabel, title, imshow, 
+                               figure, subplot, hist, xlabel, ylim, show, legend, cm)
 from mpl_toolkits.mplot3d import Axes3D
+from scipy.stats import zscore
 
 # DATA VIZUALIZATION ###############################################
 
@@ -49,12 +49,18 @@ later - for making a better model - for example we could use bining but this is 
 of this project.
 
 '''
+#create matrix of continuous variables: chol, thalach, oldpeak
 X_cont = np.column_stack((X[:,3],X[:,4],X[:,5]))
 
 attributeNames_cont = np.array([attributeNames[3],attributeNames[4],attributeNames[5]])
 
+# standardize X_cont (relative to mean and standard deviation)
+Y2 = zscore(X_cont, ddof=1)
+'''
+another way:
 Y2 = X_cont - np.ones((N, 1))*X_cont.mean(0)
 Y2 = Y2*(1/np.std(Y2,0))
+'''
 
 # Replace standardized columns into X
 X_stand = X
@@ -62,17 +68,18 @@ X_stand[:,3] = Y2[:,0]
 X_stand[:,4] = Y2[:,1]
 X_stand[:,5] = Y2[:,2]
 X_stand = np.delete(X_stand,0,1)
+
 attributeNames_ageexcl = np.delete(attributeNames,0) 
 
-# BOXPLOT: for all attributes except age: standardized to check for outliers:
+# BOXPLOT: for all attributes EXCEPT AGE: standardized to check for outliers:
 boxplot(X_stand)
 xticks(range(1,9),attributeNames_ageexcl)
-title('Boxplot for all attributes to check for outliers (with standardized cont. values)')
+title('Boxplot to check for outliers (with standardized cont. values)')
 show()
 
 # BOXPLOT FOR STANARDIZED CONTINOUS VALUES ################################# 
 boxplot(Y2)
-xticks(range(1,3),attributeNames_cont)
+xticks(range(1,4),attributeNames_cont)
 title('Boxplot for Standardized Continuous Values')
 show()
 
@@ -100,11 +107,12 @@ show()
 
 #SCATTERPLOT for continuous values ############################################
 
-# X_cont: has age, chol, thalach and oldpeak - not normalized
+# X_cont2: has age, chol, thalach and oldpeak - not normalized
 X_cont2 = np.column_stack((X[:,0],X_cont))
 attributeNames_cont2 = np.array(['age','chol', 'thalach', 'oldpeak'])
 N2, M2 = X_cont2.shape
 
+# Scatterplots:
 figure(figsize=(12,10))
 for m1 in range(M2): #loops through attributes - x direction
     for m2 in range(M2):  #loops through attrbutes - y direction
@@ -128,7 +136,7 @@ legend(classNames)
 
 show()
 
-# 3D plot ###################################################################
+# 3D PLOT ###################################################################
 # Choice: age, chol and thalach
 
 ind = [0, 1, 2]
@@ -144,5 +152,27 @@ ax.view_init(30, 220)
 ax.set_xlabel(attributeNames_cont2[ind[0]])
 ax.set_ylabel(attributeNames_cont2[ind[1]])
 ax.set_zlabel(attributeNames_cont2[ind[2]])
+
+show()
+
+# MATRIX PLOT ###############################################################
+
+# Uses standardized matrix of continous values: !Note: age is also standardized
+Y2_2 = zscore(X_cont2, ddof=1)
+
+# Replace standardized columns into X
+X_stand2 = X
+X_stand2[:,0] = Y2_2[:,0]
+X_stand2[:,3] = Y2_2[:,1]
+X_stand2[:,4] = Y2_2[:,2]
+X_stand2[:,5] = Y2_2[:,3]
+
+figure(figsize=(12,6))
+imshow(X_stand2, interpolation='none', aspect=(8./N), cmap=cm.gray);
+xticks(range(8), attributeNames)
+xlabel('Attributes')
+ylabel('Data objects')
+title('Heart Attack Possibility: Data Matrix')
+colorbar()
 
 show()
