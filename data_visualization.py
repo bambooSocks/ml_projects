@@ -5,8 +5,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import (yticks, plot, boxplot, xticks, ylabel, title, 
-                               figure, subplot, hist, xlabel, ylim, show)
+                               figure, subplot, hist, xlabel, ylim, show, legend)
 import xlrd
+from mpl_toolkits.mplot3d import Axes3D
 
 # DATA VIZUALIZATION ###############################################
 
@@ -20,12 +21,13 @@ for i in range(M):
     ylim(0,N/2)
     
 show()
-
-# Seems like age, chol and thalach are normally distributed
+'''
+Seems like age, chol and thalach are normally distributed
+'''
 
 # 
 
-# Boxplots: for all attributes
+# BOXPLOT: for all attributes ################################################
 
 boxplot(X)
 xticks(range(1,9),attributeNames)
@@ -51,24 +53,36 @@ X_cont = np.column_stack((X[:,3],X[:,4],X[:,5]))
 
 attributeNames_cont = np.array([attributeNames[3],attributeNames[4],attributeNames[5]])
 
-boxplot(X_cont)
-xticks(range(1,3),attributeNames_cont)
-title('Boxplot for continuous values')
-show()
-
 Y2 = X_cont - np.ones((N, 1))*X_cont.mean(0)
 Y2 = Y2*(1/np.std(Y2,0))
 
-# We do the boxplot again: 
+# Replace standardized columns into X
+X_stand = X
+X_stand[:,3] = Y2[:,0]
+X_stand[:,4] = Y2[:,1]
+X_stand[:,5] = Y2[:,2]
+X_stand = np.delete(X_stand,0,1)
+attributeNames_ageexcl = np.delete(attributeNames,0) 
+
+# BOXPLOT: for all attributes except age: standardized to check for outliers:
+boxplot(X_stand)
+xticks(range(1,9),attributeNames_ageexcl)
+title('Boxplot for all attributes to check for outliers (with standardized cont. values)')
+show()
+
+# BOXPLOT FOR STANARDIZED CONTINOUS VALUES ################################# 
 boxplot(Y2)
 xticks(range(1,3),attributeNames_cont)
 title('Boxplot for Standardized Continuous Values')
 show()
 
-# Looks better now. We should discuss which outliers to remove
+'''
+Looks better now. WE SHOULD DISCUSS WHICH OUTLIERS TO REMOVE
+'''
 
-# Boxplot based on each class: more chance/ less chance of heart attack
-# Also align them on the same axis for better comparison
+# BOXPLOT based on each class #################################################
+# more chance/ less chance of heart attack
+# Also aligned on the same axis for better comparison
 
 figure(figsize=(14,7))
 for c in range(C):
@@ -82,24 +96,11 @@ for c in range(C):
 
 show()
 
-# Replace standardized columns into X
-X_stand = X
-X_stand[:,3] = Y2[:,0]
-X_stand[:,4] = Y2[:,1]
-X_stand[:,5] = Y2[:,2]
-X_stand = np.delete(X_stand,0,1)
-attributeNames_ageexcl = np.delete(attributeNames,0) 
 
-# Boxplot for whole X to check for outliers:
-boxplot(X_stand)
-xticks(range(1,9),attributeNames)
-title('Boxplot for all attributes to check for outliers (with standardized cont. values)')
-show()
 
-#Scatterplot: combination of 2 attributes against each other
-#Work with continuous values only
+#SCATTERPLOT for continuous values ############################################
 
-#Use X_cont but add age on top of it - basically shows all continuous variables,  not normalized
+# X_cont: has age, chol, thalach and oldpeak - not normalized
 X_cont2 = np.column_stack((X[:,0],X_cont))
 attributeNames_cont2 = np.array(['age','chol', 'thalach', 'oldpeak'])
 N2, M2 = X_cont2.shape
@@ -114,16 +115,34 @@ for m1 in range(M2): #loops through attributes - x direction
             plot(np.array(X_cont2[class_mask,m2]), np.array(X_cont2[class_mask,m1]), '.')
       
             #LABELS:
-            if m1==M2-1: #makes labels when 1st axis is finished
+            if m1==M2-1: #makes labels when 1st axis
                 xlabel(attributeNames_cont2[m2])
             else:
                 xticks([])
-            if m2==0: #makes labels for y - only once
+            if m2==0: #makes labels for y axis
                 ylabel(attributeNames_cont2[m1])
             else:
                 yticks([])
-            #ylim(0,X.max()*1.1)
-            #xlim(0,X.max()*1.1)
+
 legend(classNames)
+
+show()
+
+# 3D plot ###################################################################
+# Choice: age, chol and thalach
+
+ind = [0, 1, 2]
+colors = ['blue', 'green', 'red']
+
+f = figure()
+ax = f.add_subplot(111, projection='3d')
+for c in range(C):
+    class_mask = (y==c)
+    s = ax.scatter(X_cont2[class_mask,ind[0]], X_cont2[class_mask,ind[1]], X_cont2[class_mask,ind[2]], c=colors[c])
+
+ax.view_init(30, 220)
+ax.set_xlabel(attributeNames_cont2[ind[0]])
+ax.set_ylabel(attributeNames_cont2[ind[1]])
+ax.set_zlabel(attributeNames_cont2[ind[2]])
 
 show()
