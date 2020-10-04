@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import (yticks, plot, boxplot, xticks, ylabel, title, imshow, 
-                               figure, subplot, hist, xlabel, ylim, show, legend, cm)
+                               figure, subplot, hist, xlabel, ylim, show, legend, cm, colorbar)
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.stats import zscore
 

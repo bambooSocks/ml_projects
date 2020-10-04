@@ -5,14 +5,10 @@ from matplotlib.pyplot import boxplot, xticks, ylabel, title, figure, subplot, h
 import xlrd
 
 df = pd.read_csv("heart.csv")
-cols = np.asarray(df.columns)
 
-data = df.to_numpy()
+cols = ['age', 'sex', 'cp', 'chol', 'thalach', 'oldpeak', 'slope', 'thal', 'target']
 
-print(cols)
-print(data)
-
-thal = np.transpose(data)[12]
+data = df[cols].to_numpy()
 
 #plt.hist(thal, bins=4, rwidth=0.75, color=['red', 'blue', 'green', 'yellow'])
 #plt.show()
@@ -21,11 +17,7 @@ thal = np.transpose(data)[12]
 #re-arrange columns (so the ones we don't need are last)
 X = data
 attributeNames = cols
-rem_col = np.array([3,4,4,5,7])
-for i in range(5):
-    p=rem_col[i]
-    X = np.delete(X,p,1)
-    attributeNames = np.delete(attributeNames, p)
+
 
 # delete last column of X (which is the class attribute)
 X = np.delete(X,-1,1)
