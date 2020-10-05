@@ -1,51 +1,46 @@
 # -*- coding: utf-8 -*-
 
-from main import *
 from continuous_data import *
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from scipy.stats import zscore
 from scipy import stats
 
-# DATA VIZUALIZATION ###############################################
+# DATA VISUALISATION
 
-
-
-# Try histogram for all variables
-figure(figsize=(8,7))
-u = np.floor(np.sqrt(M)); v = np.ceil(float(M)/u)
-for i in range(M):
-    subplot(u,v,i+1)
-    hist(X[:,i], color=(0.2, 0.9-i*0.1, 0.4))
-    xlabel(attributeNames[i])
-    ylim(0,N/2)
+# histogram for all variables
+plt.figure(figsize=(8, 7))
+u = int(np.floor(np.sqrt(M_sel)))
+v = int(np.ceil(float(M_sel)/u))
+for i in range(M_sel):
+    plt.subplot(u, v, i+1)
+    plt.hist(X_sel[:, i], color=(0.2, 0.9 - i * 0.05, 0.4))
+    plt.xlabel(sel_attr[i])
+    plt.ylim(0, N_sel/2)
     
-show()
+plt.show()
 
 X_cont_stand = (X_cont - np.ones((N_cont, 1)) * X_cont.mean(axis=0)) / X_cont.std(axis=0)
 
 # Histogram for standardized continuous variables + pdf function
-figure(figsize=(8,7))
-u = np.floor(np.sqrt(M_cont)); v = np.ceil(float(M_cont)/u)
+plt.figure(figsize=(8, 7))
+u = int(np.floor(np.sqrt(M_cont)))
+v = int(np.ceil(float(M_cont)/u))
 for i in range(M_cont):
-    subplot(u,v,i+1)
-    plt.hist(X_cont_stand[:,i], color=(0.2, 0.9-i*0.1, 0.4))
-
-    xlabel(attributeNames_cont[i])
-    ylim(0,N_cont/2)
+    plt.subplot(u, v, i+1)
+    plt.hist(X_cont_stand[:, i], color=(0.2, 0.9-i*0.1, 0.4))
+    plt.xlabel(cont_attr[i])
+    plt.ylim(0, N_cont/2)
     
-    x = np.linspace(X_cont_stand[:,i].min(), X_cont_stand[:,i].max(), 1000)
+    x = np.linspace(X_cont_stand[:, i].min(), X_cont_stand[:, i].max(), 1000)
     
-    mean = float(np.mean (X_cont_stand[:,i]))
-    std = float(np.std (X_cont_stand[:,i]))
-    print(mean)
-    print(std)
-    pdf = stats.norm.pdf(x,mean,std)*(N_cont/2)
-    plot(x,pdf,'.',color='red', linewidth=0.5)
+    mean = float(np.mean(X_cont_stand[:, i]))
+    std = float(np.std(X_cont_stand[:, i]))
+    pdf = stats.norm.pdf(x, mean, std)*(N_cont/2)
+    plt.plot(x, pdf, '.', color='red', linewidth=0.5)
     
-show()
+plt.show()
 
 
 '''
@@ -55,12 +50,12 @@ Seems like age, trestrbps, chol and thalach are normally distributed
 # BOXPLOT: for all attributes ################################################
 
 plt.boxplot(X_wo)
-plt.xticks(range(1, 10), attributeNames_wo, fontsize=8)
+plt.xticks(range(len(attr)), attr, fontsize=8)
 plt.title('Boxplot with outliers')
 plt.show()
 
 plt.boxplot(X)
-plt.xticks(range(1, 10), attributeNames, fontsize=8)
+plt.xticks(range(len(attr)), attr, fontsize=8)
 plt.title('Boxplot without outliers')
 plt.show()
 
@@ -98,7 +93,7 @@ Now we make a couple of boxplots for better understanding of our data
 
 # BOXPLOT: all X dataset, with standardized continuous attributes:
 plt.boxplot(X_stand_wo)
-plt.xticks(range(1, 10), attributeNames_wo, fontsize=8)
+plt.xticks(range(len(attr)), attr, fontsize=8)
 plt.title('Boxplot to check for outliers (with standardized cont. values)')
 plt.show()
 
@@ -107,12 +102,12 @@ Y2 = zscore(X_cont, ddof=1)
 
 # BOXPLOT: only for standardized continuous values + aligned ################################# 
 plt.boxplot(Y2_wo)
-plt.xticks(range(1, 6), attributeNames_cont)
+plt.xticks(range(len(cont_attr)), cont_attr)
 plt.title('Boxplot for Standardized Continuous Values - with outliers')
 plt.show()
 
 plt.boxplot(Y2)
-plt.xticks(range(1, 6), attributeNames_cont)
+plt.xticks(range(len(cont_attr)), cont_attr)
 plt.title('Boxplot for Standardized Continuous Values - without outliers')
 plt.show()
 
@@ -137,17 +132,17 @@ N2, M2 = X_cont.shape
 # more chance/ less chance of heart attack 
 # Also aligned on the same axis for better comparison
 
-plt.figure(figsize=(14,7))
+plt.figure(figsize=(14, 7))
 for c in range(C):
     plt.subplot(1, C, c+1)
     class_mask = (y == c)
     plt.boxplot(Y2[class_mask, :])
     plt.title('Boxplot for Class: '+classNames[c])
-    plt.xticks(range(1,len(attributeNames_cont)+1), [a[:7] for a in attributeNames_cont], rotation=45)
+    plt.xticks(range(len(cont_attr)), [a[:7] for a in cont_attr], rotation=45)
     y_up = Y2.max()+(Y2.max()-Y2.min())*0.1; y_down = Y2.min()-(Y2.max()-Y2.min())*0.1
     plt.ylim(y_down, y_up)
 
-show()
+plt.show()
 
 
 # SCATTERPLOT for continuous values ############################################
@@ -164,11 +159,11 @@ for m1 in range(M2):  # loops through attributes - x direction
       
             # LABELS:
             if m1 == M2-1:  # makes labels when 1st axis
-                plt.xlabel(attributeNames_cont[m2])
+                plt.xlabel(cont_attr[m2])
             else:
                 plt.xticks([])
             if m2 == 0:  # makes labels for y axis
-                plt.ylabel(attributeNames_cont[m1])
+                plt.ylabel(cont_attr[m1])
             else:
                 plt.yticks([])
 
@@ -178,7 +173,7 @@ plt.show()
 
 # CORRELATION MATRIX
 corMat = np.corrcoef(X_cont, rowvar=False)
-out = pd.DataFrame(corMat, columns=list(attributeNames_cont))
+out = pd.DataFrame(corMat, columns=list(cont_attr))
 print(out.to_latex(float_format="%.2f"))
 
 # 3D PLOT ###################################################################
@@ -194,18 +189,17 @@ for c in range(C):
     s = ax.scatter(X_cont[class_mask, ind[0]], X_cont[class_mask, ind[1]], X_cont[class_mask, ind[2]], c=colors[c])
 
 ax.view_init(30, 220)
-ax.set_xlabel(attributeNames_cont[ind[0]])
-ax.set_ylabel(attributeNames_cont[ind[1]])
-ax.set_zlabel(attributeNames_cont[ind[2]])
+ax.set_xlabel(cont_attr[ind[0]])
+ax.set_ylabel(cont_attr[ind[1]])
+ax.set_zlabel(cont_attr[ind[2]])
 
 plt.show()
 
 # MATRIX PLOT ###############################################################
 
-
-plt.figure(figsize=(12,6))
+plt.figure(figsize=(12, 6))
 plt.imshow(Y2, interpolation='none', aspect=(8./N), cmap=plt.cm.gray)
-plt.xticks(range(5), attributeNames)
+plt.xticks(range(len(cont_attr)), cont_attr)
 plt.xlabel('Attributes')
 plt.ylabel('Data objects')
 plt.title('Heart Attack Possibility: Data Matrix')

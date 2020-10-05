@@ -5,7 +5,7 @@ from scipy.linalg import svd
 from continuous_data import *
 
 
-Y = X_cont - np.ones((N_cont, 1)) * X_cont.mean(axis=0)
+Y = (X_cont - np.ones((N_cont, 1)) * X_cont.mean(axis=0)) / X_cont.std(axis=0)
 
 # PCA by computing SVD of Y
 U, S, Vh = svd(Y, full_matrices=False)
@@ -61,7 +61,7 @@ The first 2 components explained 90% of variance.
 So we will select v1,v2 and we'll look at their coefficients:
     
 '''
-pcs = [0, 1, 2]
+pcs = [0, 1, 2, 3]
 legendStrs = ['PC'+str(e+1) for e in pcs]
 c = ['r', 'g']
 bw = .2
@@ -86,6 +86,8 @@ print('\n PC2:')
 print(V[:, 1].T)
 print('\n PC3:')
 print(V[:, 2].T)
+print('\n PC4:')
+print(V[:, 3].T)
 
 # Looking at the data for target class 0:
 less_chance_data = Y[y == 0, :]
