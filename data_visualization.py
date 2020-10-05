@@ -49,13 +49,13 @@ Seems like age, trestrbps, chol and thalach are normally distributed
 
 # BOXPLOT: for all attributes ################################################
 
-plt.boxplot(X_wo)
-plt.xticks(range(len(attr)), attr, fontsize=8)
+plt.boxplot(X_sel_wo)
+plt.xticks(range(1, len(sel_attr)+1), sel_attr, fontsize=8)
 plt.title('Boxplot with outliers')
 plt.show()
 
-plt.boxplot(X)
-plt.xticks(range(len(attr)), attr, fontsize=8)
+plt.boxplot(X_sel)
+plt.xticks(range(1, len(sel_attr)+1), sel_attr, fontsize=8)
 plt.title('Boxplot without outliers')
 plt.show()
 
@@ -77,7 +77,7 @@ Y2_wo = zscore(X_cont_wo, ddof=1)
 
 N2, M2 = X_cont_wo.shape
 
-# Replace in X_wo the columns with standardized attrbiutes
+# Replace in X_wo the columns with standardized attributes
 X_stand_wo = X_wo
 
 # Replace standardized columns into X
@@ -86,14 +86,14 @@ X_stand_wo[:, 3] = Y2_wo[:, 1]
 X_stand_wo[:, 4] = Y2_wo[:, 2]
 X_stand_wo[:, 5] = Y2_wo[:, 3]
 X_stand_wo[:, 6] = Y2_wo[:, 4]
-
+print(X_stand_wo[0])
 '''
 Now we make a couple of boxplots for better understanding of our data
 '''
 
 # BOXPLOT: all X dataset, with standardized continuous attributes:
 plt.boxplot(X_stand_wo)
-plt.xticks(range(len(attr)), attr, fontsize=8)
+plt.xticks(range(1, len(attr)+1), attr, fontsize=8)
 plt.title('Boxplot to check for outliers (with standardized cont. values)')
 plt.show()
 
@@ -102,12 +102,12 @@ Y2 = zscore(X_cont, ddof=1)
 
 # BOXPLOT: only for standardized continuous values + aligned ################################# 
 plt.boxplot(Y2_wo)
-plt.xticks(range(len(cont_attr)), cont_attr)
+plt.xticks(range(1, len(cont_attr)+1), cont_attr)
 plt.title('Boxplot for Standardized Continuous Values - with outliers')
 plt.show()
 
 plt.boxplot(Y2)
-plt.xticks(range(len(cont_attr)), cont_attr)
+plt.xticks(range(1, len(cont_attr)+1), cont_attr)
 plt.title('Boxplot for Standardized Continuous Values - without outliers')
 plt.show()
 
@@ -138,7 +138,7 @@ for c in range(C):
     class_mask = (y == c)
     plt.boxplot(Y2[class_mask, :])
     plt.title('Boxplot for Class: '+classNames[c])
-    plt.xticks(range(len(cont_attr)), [a[:7] for a in cont_attr], rotation=45)
+    plt.xticks(range(1, len(cont_attr)+1), [a[:7] for a in cont_attr], rotation=45)
     y_up = Y2.max()+(Y2.max()-Y2.min())*0.1; y_down = Y2.min()-(Y2.max()-Y2.min())*0.1
     plt.ylim(y_down, y_up)
 
@@ -199,7 +199,7 @@ plt.show()
 
 plt.figure(figsize=(12, 6))
 plt.imshow(Y2, interpolation='none', aspect=(8./N), cmap=plt.cm.gray)
-plt.xticks(range(len(cont_attr)), cont_attr)
+plt.xticks(range(1, len(cont_attr)+1), cont_attr)
 plt.xlabel('Attributes')
 plt.ylabel('Data objects')
 plt.title('Heart Attack Possibility: Data Matrix')

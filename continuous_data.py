@@ -8,6 +8,7 @@ y_attr = 'target'
 cont_attr = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
 sel_attr = ['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope', 'thal']
 
+X_sel_wo = df[sel_attr].to_numpy()
 
 # Removing outliers (based on box plots from data_visualization)
 for col in df.columns:
