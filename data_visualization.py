@@ -4,8 +4,6 @@ from main import *
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import (yticks, plot, boxplot, xticks, ylabel, title, imshow, 
-                               figure, subplot, hist, xlabel, ylim, show, legend, cm, colorbar)
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.stats import zscore
 
@@ -23,16 +21,16 @@ Y2 = zscore(X_cont, ddof=1)
 N2, M2 = X_cont.shape
 
 # Try histogram for all variables
-figure(figsize=(8, 7))
+plt.figure(figsize=(8, 7))
 u = np.floor(np.sqrt(M))
 v = np.ceil(float(M)/u)
 for i in range(M):
-    subplot(u, v, i+1)
-    hist(X[:, i], color=(0.1, 0.8-i*0.1, 0.4))
-    xlabel(attributeNames[i])
-    ylim(0, N/2)
+    plt.subplot(u, v, i+1)
+    plt.hist(X[:, i], color=(0.1, 0.8-i*0.1, 0.4))
+    plt.xlabel(attributeNames[i])
+    plt.ylim(0, N/2)
     
-show()
+plt.show()
 
 '''
 Seems like age, trestrbps, chol and thalach are normally distributed
@@ -41,10 +39,10 @@ Seems like age, trestrbps, chol and thalach are normally distributed
 
 # BOXPLOT: for all attributes ################################################
 
-boxplot(X)
-xticks(range(1, 10), attributeNames, fontsize=8)
-title('Boxplot for all attributes')
-show()
+plt.boxplot(X)
+plt.xticks(range(1, 10), attributeNames, fontsize=8)
+plt.title('Boxplot for all attributes')
+plt.show()
 
 '''
 It can clearly be seen that tje continuous variables are at different scales
@@ -58,10 +56,10 @@ to get a standardized columns for the continuous variables
 
 
 # BOXPLOT: only for standardized continuous values + aligned ################################# 
-boxplot(Y2)
-xticks(range(1, 6), attributeNames_cont)
-title('Boxplot for Standardized Continuous Values')
-show()
+plt.boxplot(Y2)
+plt.xticks(range(1, 6), attributeNames_cont)
+plt.title('Boxplot for Standardized Continuous Values')
+plt.show()
 
 X_stand = X
 
@@ -74,10 +72,10 @@ X_stand[:, 6] = Y2[:, 4]
 
 
 # BOXPLOT: all X dataset, with standardized continuous attributes:
-boxplot(X_stand)
-xticks(range(1, 10), attributeNames, fontsize=8)
-title('Boxplot to check for outliers (with standardized cont. values)')
-show()
+plt.boxplot(X_stand)
+plt.xticks(range(1, 10), attributeNames, fontsize=8)
+plt.title('Boxplot to check for outliers (with standardized cont. values)')
+plt.show()
 
 
 '''
@@ -88,15 +86,15 @@ Looks better now. WE SHOULD DISCUSS WHICH OUTLIERS TO REMOVE
 # more chance/ less chance of heart attack
 # Also aligned on the same axis for better comparison
 
-figure(figsize=(14,7))
+plt.figure(figsize=(14,7))
 for c in range(C):
-    subplot(1, C, c+1)
+    plt.subplot(1, C, c+1)
     class_mask = (y == c)
-    boxplot(Y2[class_mask, :])
-    title('Boxplot for Class: '+classNames[c])
-    xticks(range(1,len(attributeNames_cont)+1), [a[:7] for a in attributeNames_cont], rotation=45)
+    plt.boxplot(Y2[class_mask, :])
+    plt.title('Boxplot for Class: '+classNames[c])
+    plt.xticks(range(1,len(attributeNames_cont)+1), [a[:7] for a in attributeNames_cont], rotation=45)
     y_up = Y2.max()+(Y2.max()-Y2.min())*0.1; y_down = Y2.min()-(Y2.max()-Y2.min())*0.1
-    ylim(y_down, y_up)
+    plt.ylim(y_down, y_up)
 
 show()
 
@@ -104,29 +102,33 @@ show()
 # SCATTERPLOT for continuous values ############################################
 
 # Scatterplots:
-figure(figsize=(12, 10))
+plt.figure(figsize=(12, 10))
 for m1 in range(M2):  # loops through attributes - x direction
     for m2 in range(M2):  # loops through attrbutes - y direction
-        subplot(M2, M2, m1*M2 + m2 + 1)
+        plt.subplot(M2, M2, m1*M2 + m2 + 1)
         # loops through classes:
         for c in range(C):
             class_mask = (y == c)
-            plot(np.array(X_cont[class_mask, m2]), np.array(X_cont[class_mask, m1]), '.', alpha=.5)
+            plt.plot(np.array(X_cont[class_mask, m2]), np.array(X_cont[class_mask, m1]), '.', alpha=.5)
       
             # LABELS:
             if m1 == M2-1:  # makes labels when 1st axis
-                xlabel(attributeNames_cont[m2])
+                plt.xlabel(attributeNames_cont[m2])
             else:
-                xticks([])
+                plt.xticks([])
             if m2 == 0:  # makes labels for y axis
-                ylabel(attributeNames_cont[m1])
+                plt.ylabel(attributeNames_cont[m1])
             else:
-                yticks([])
+                plt.yticks([])
 
-legend(classNames)
+plt.legend(classNames)
 
-show()
+plt.show()
 
+# CORRELATION MATRIX
+corMat = np.corrcoef(X_cont, rowvar=False)
+out = pd.DataFrame(corMat, columns=list(attributeNames_cont))
+print(out.to_latex(float_format="%.2f"))
 
 # 3D PLOT ###################################################################
 # Choice: age, chol and thalach
@@ -134,7 +136,7 @@ show()
 ind = [0, 1, 2]
 colors = ['blue', 'green', 'red']
 
-f = figure()
+f = plt.figure()
 ax = f.add_subplot(111, projection='3d')
 for c in range(C):
     class_mask = (y == c)
@@ -145,17 +147,17 @@ ax.set_xlabel(attributeNames_cont[ind[0]])
 ax.set_ylabel(attributeNames_cont[ind[1]])
 ax.set_zlabel(attributeNames_cont[ind[2]])
 
-show()
+plt.show()
 
 # MATRIX PLOT ###############################################################
 
 
-figure(figsize=(12,6))
-imshow(X_stand, interpolation='none', aspect=(8./N), cmap=cm.gray)
-xticks(range(9), attributeNames)
-xlabel('Attributes')
-ylabel('Data objects')
-title('Heart Attack Possibility: Data Matrix')
-colorbar()
+plt.figure(figsize=(12,6))
+plt.imshow(X_stand, interpolation='none', aspect=(8./N), cmap=plt.cm.gray)
+plt.xticks(range(9), attributeNames)
+plt.xlabel('Attributes')
+plt.ylabel('Data objects')
+plt.title('Heart Attack Possibility: Data Matrix')
+plt.colorbar()
 
-show()
+plt.show()
