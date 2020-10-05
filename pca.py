@@ -5,7 +5,7 @@ from scipy.linalg import svd
 from continuous_data import *
 
 
-Y = X - np.ones((N, 1)) * X.mean(axis=0)
+Y = X_cont - np.ones((N_cont, 1)) * X_cont.mean(axis=0)
 
 # PCA by computing SVD of Y
 U, S, Vh = svd(Y, full_matrices=False)
@@ -65,10 +65,10 @@ pcs = [0, 1]
 legendStrs = ['PC'+str(e+1) for e in pcs]
 c = ['r', 'g']
 bw = .2
-r = np.arange(1, M+1)
+r = np.arange(1, M_cont+1)
 for i in pcs:    
     plt.bar(r+i*bw, V[:, i], width=bw)
-plt.xticks(r+bw, attributeNames)
+plt.xticks(r+bw, attributeNames_cont)
 plt.xlabel('Attributes')
 plt.ylabel('Component coefficients')
 plt.legend(legendStrs)
