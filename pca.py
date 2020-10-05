@@ -55,4 +55,63 @@ ylabel('PC{0}'.format(j+1))
 
 # Output result to screen
 show()
+'''
+Projection of attributes on PC1
+The first 2 components explaiend 90% of variance.
+So we will select v1,v2 and we'll look at their coefficients:
+    
+'''
+pcs = [0,1]
+legendStrs = ['PC'+str(e+1) for e in pcs]
+c = ['r','g']
+bw = .2
+r = np.arange(1,M+1)
+for i in pcs:    
+    plt.bar(r+i*bw, V[:,i], width=bw)
+plt.xticks(r+bw, attributeNames)
+plt.xlabel('Attributes')
+plt.ylabel('Component coefficients')
+plt.legend(legendStrs)
+plt.grid()
+plt.title('Heart Attack Pssibility: PCA Component Coefficients')
+plt.show()
 
+'''
+Inspecting the plot, we see that the first PC has a large negative magnitutde 
+for chol, whereas the 2nd PC has a large negative magnitutde for talach.  
+'''
+print('\n PC1:')
+print(V[:,0].T)
+print('\n PC2:')
+print(V[:,1].T)
+
+
+
+# Looking at the data for target class 0:
+less_chance_data = Y[y==0,:]
+
+print('\n First observation for a class with less chance of heart attack:')
+print(less_chance_data[0,:]) #selects first observation 
+
+# Based on the coefficients and the attribute values for the observation
+# displayed, one would expect the projection onto PC1 and PC2 to be positive:
+
+# You can determine the projection by (remove comments):
+print('\n - its projection onto PC1 ')
+print(less_chance_data[0,:]@V[:,0]) 
+
+print('\n - its projection onto PC2')
+print(less_chance_data[0,:]@V[:,1]) 
+print()
+
+'''
+This makes sense. 
+One would expect the printed observation to have a negative 
+projection onto PC1 since it has positive age, positive trestbps, positive chol,
+negative thalach and positive oldpeak.
+
+One would also expect the printed observation to hace a positive projection
+onto PC2 based on the attributes mentioned above (postivie age, trestbps etc.)
+
+
+'''
