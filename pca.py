@@ -61,7 +61,7 @@ The first 2 components explained 90% of variance.
 So we will select v1,v2 and we'll look at their coefficients:
     
 '''
-pcs = [0, 1]
+pcs = [0, 1, 2]
 legendStrs = ['PC'+str(e+1) for e in pcs]
 c = ['r', 'g']
 bw = .2
@@ -84,6 +84,8 @@ print('\n PC1:')
 print(V[:, 0].T)
 print('\n PC2:')
 print(V[:, 1].T)
+print('\n PC3:')
+print(V[:, 2].T)
 
 # Looking at the data for target class 0:
 less_chance_data = Y[y == 0, :]

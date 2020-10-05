@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-from matplotlib.pyplot import (yticks, plot, boxplot, xticks, ylabel, title, imshow, 
-                               figure, subplot, hist, xlabel, ylim, show, legend, cm, colorbar)
+import matplotlib.pyplot as plt
 
 df = pd.read_csv("heart.csv")
 
@@ -55,10 +54,10 @@ N_cont, M_cont = X_cont.shape
 C = len(classNames)
 
 
-boxplot(X_cont)
-xticks(range(1, 5), attributeNames_cont, fontsize=8)
-title('Boxplot for all attributes')
-show()
+# plt.boxplot(X_cont)
+# plt.xticks(range(1, 5), attributeNames_cont, fontsize=8)
+# plt.title('Boxplot for all attributes')
+# plt.show()
 
 # Standardized data:
 
