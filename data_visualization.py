@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from main import *
+from main2 import *
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -120,7 +120,7 @@ for m1 in range(M2): #loops through attributes - x direction
         #loops through classes:
         for c in range(C):
             class_mask = (y==c)
-            plot(np.array(X_cont2[class_mask,m2]), np.array(X_cont2[class_mask,m1]), '.')
+            plot(np.array(X_cont2[class_mask,m2]), np.array(X_cont2[class_mask,m1]), '.', alpha=.5)
       
             #LABELS:
             if m1==M2-1: #makes labels when 1st axis

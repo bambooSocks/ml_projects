@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,15 +7,10 @@ import xlrd
 
 df = pd.read_csv("heart.csv")
 
-#extract CONTINUOUS variables
-cols = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'target']
+cols = ['age', 'sex', 'cp', 'chol', 'thalach', 'oldpeak', 'slope', 'thal', 'target']
 
 data = df[cols].to_numpy()
 
-#plt.hist(thal, bins=4, rwidth=0.75, color=['red', 'blue', 'green', 'yellow'])
-#plt.show()
-
-# Data selecting subset
 #re-arrange columns (so the ones we don't need are last)
 X = data
 attributeNames = cols
@@ -47,9 +43,3 @@ y = np.array([classDict[cl] for cl in classLabels])
 N, M = X.shape
 #no of classes
 C = len(classNames)
-
-
-
-
-
-    
