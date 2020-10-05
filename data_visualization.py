@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.stats import zscore
+from scipy import stats
 
 # DATA VIZUALIZATION ###############################################
 
@@ -20,6 +21,29 @@ for i in range(M):
     hist(X[:,i], color=(0.2, 0.9-i*0.1, 0.4))
     xlabel(attributeNames[i])
     ylim(0,N/2)
+    
+show()
+
+X_cont_stand = (X_cont - np.ones((N_cont, 1)) * X_cont.mean(axis=0)) / X_cont.std(axis=0)
+
+# Histogram for standardized continuous variables + pdf function
+figure(figsize=(8,7))
+u = np.floor(np.sqrt(M_cont)); v = np.ceil(float(M_cont)/u)
+for i in range(M_cont):
+    subplot(u,v,i+1)
+    plt.hist(X_cont_stand[:,i], color=(0.2, 0.9-i*0.1, 0.4))
+
+    xlabel(attributeNames_cont[i])
+    ylim(0,N_cont/2)
+    
+    x = np.linspace(X_cont_stand[:,i].min(), X_cont_stand[:,i].max(), 1000)
+    
+    mean = float(np.mean (X_cont_stand[:,i]))
+    std = float(np.std (X_cont_stand[:,i]))
+    print(mean)
+    print(std)
+    pdf = stats.norm.pdf(x,mean,std)*(N_cont/2)
+    plot(x,pdf,'.',color='red', linewidth=0.5)
     
 show()
 
