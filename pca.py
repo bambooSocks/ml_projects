@@ -1,14 +1,14 @@
 import pandas as pd
 import numpy as np
-from matplotlib.pyplot import figure, plot, title, xlabel, ylabel, show, legend
+import matplotlib.pyplot as plt
 from scipy.linalg import svd
 from continuous_data import *
 
 
-Y = X - np.ones((N,1))*X.mean(axis=0)
+Y = X - np.ones((N, 1)) * X.mean(axis=0)
 
 # PCA by computing SVD of Y
-U,S,Vh = svd(Y,full_matrices=False)
+U, S, Vh = svd(Y, full_matrices=False)
 # scipy.linalg.svd returns "Vh", which is the Hermitian (transposed)
 
 # Compute variance explained by principal components
@@ -18,13 +18,13 @@ threshold = 0.9
 
 # Plot variance explained
 plt.figure()
-plt.plot(range(1,len(rho)+1),rho,'x-')
-plt.plot(range(1,len(rho)+1),np.cumsum(rho),'o-')
-plt.plot([1,len(rho)],[threshold, threshold],'k--')
-plt.title('Variance explained by principal components');
-plt.xlabel('Principal component');
-plt.ylabel('Variance explained');
-plt.legend(['Individual','Cumulative','Threshold'])
+plt.plot(range(1, len(rho)+1), rho, 'x-')
+plt.plot(range(1, len(rho)+1), np.cumsum(rho), 'o-')
+plt.plot([1, len(rho)], [threshold, threshold], 'k--')
+plt.title('Variance explained by principal components')
+plt.xlabel('Principal component')
+plt.ylabel('Variance explained')
+plt.legend(['Individual', 'Cumulative', 'Threshold'])
 plt.grid()
 plt.show()
 
@@ -32,76 +32,74 @@ plt.show()
 First 2 PCAs describe roughly 90% of variance
 '''
 
-V = Vh.T    
+V = Vh.T
 
 # Project the centered data onto principal component space
-Z = Y @ V  #@ in python: projects vector
+Z = Y @ V  # @ in python: projects vector
 
 # Indices of the principal components to be plotted: v1 and v2
 i = 0
 j = 1
 
 # Plot PCA of the data
-f = figure()
-title('Heart Attack Pssibility data: PCA')
-#Z = array(Z)
+f = plt.figure()
+plt.title('Heart Attack Possibility data: PCA')
+# Z = array(Z)
 for c in range(C):
     # select indices belonging to class c:
-    class_mask = y==c
-    plot(Z[class_mask,i], Z[class_mask,j], 'o', alpha=.5)
-legend(classNames)
-xlabel('PC{0}'.format(i+1))
-ylabel('PC{0}'.format(j+1))
+    class_mask = y == c
+    plt.plot(Z[class_mask, i], Z[class_mask, j], 'o', alpha=.5)
+plt.legend(classNames)
+plt.xlabel('PC{0}'.format(i+1))
+plt.ylabel('PC{0}'.format(j+1))
 
 # Output result to screen
-show()
+plt.show()
 '''
 Projection of attributes on PC1
-The first 2 components explaiend 90% of variance.
+The first 2 components explained 90% of variance.
 So we will select v1,v2 and we'll look at their coefficients:
     
 '''
-pcs = [0,1]
+pcs = [0, 1]
 legendStrs = ['PC'+str(e+1) for e in pcs]
-c = ['r','g']
+c = ['r', 'g']
 bw = .2
-r = np.arange(1,M+1)
+r = np.arange(1, M+1)
 for i in pcs:    
-    plt.bar(r+i*bw, V[:,i], width=bw)
+    plt.bar(r+i*bw, V[:, i], width=bw)
 plt.xticks(r+bw, attributeNames)
 plt.xlabel('Attributes')
 plt.ylabel('Component coefficients')
 plt.legend(legendStrs)
 plt.grid()
-plt.title('Heart Attack Pssibility: PCA Component Coefficients')
+plt.title('Heart Attack Possibility: PCA Component Coefficients')
 plt.show()
 
 '''
-Inspecting the plot, we see that the first PC has a large negative magnitutde 
-for chol, whereas the 2nd PC has a large negative magnitutde for talach.  
+Inspecting the plot, we see that the first PC has a large negative magnitude 
+for chol, whereas the 2nd PC has a large negative magnitude for thalach.  
 '''
 print('\n PC1:')
-print(V[:,0].T)
+print(V[:, 0].T)
 print('\n PC2:')
-print(V[:,1].T)
-
-
+print(V[:, 1].T)
 
 # Looking at the data for target class 0:
-less_chance_data = Y[y==0,:]
+less_chance_data = Y[y == 0, :]
 
 print('\n First observation for a class with less chance of heart attack:')
-print(less_chance_data[0,:]) #selects first observation 
+print(less_chance_data[0, :])  # selects first observation
 
 # Based on the coefficients and the attribute values for the observation
 # displayed, one would expect the projection onto PC1 and PC2 to be positive:
 
 # You can determine the projection by (remove comments):
 print('\n - its projection onto PC1 ')
-print(less_chance_data[0,:]@V[:,0]) 
+print(less_chance_data[0, :]@V[:, 0])
 
 print('\n - its projection onto PC2')
-print(less_chance_data[0,:]@V[:,1]) 
+print(less_chance_data[0, :]@V[:, 1])
 print()
 
 '''
