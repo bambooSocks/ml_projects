@@ -7,15 +7,10 @@ import xlrd
 df = pd.read_csv("heart.csv")
 
 #extract CONTINUOUS variables
-cols = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'target']
+cols = ['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope', 'thal', 'target']
 
 data = df[cols].to_numpy()
 
-#plt.hist(thal, bins=4, rwidth=0.75, color=['red', 'blue', 'green', 'yellow'])
-#plt.show()
-
-# Data selecting subset
-#re-arrange columns (so the ones we don't need are last)
 X = data
 attributeNames = cols
 

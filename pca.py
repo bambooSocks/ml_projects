@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from matplotlib.pyplot import figure, plot, title, xlabel, ylabel, show, legend
 from scipy.linalg import svd
-from main import *
+from continuous_data import *
 
 
 Y = X - np.ones((N,1))*X.mean(axis=0)

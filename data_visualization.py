@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from main2 import *
+from main import *
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,7 +11,20 @@ from scipy.stats import zscore
 
 # DATA VIZUALIZATION ###############################################
 
-#Histograms  
+#create matrix of continuous variables: age, trestbps, chol, thalach, oldpeak
+X_cont = np.column_stack((X[:,0],X[:,3],X[:,4],X[:,5],X[:,6]))
+
+attributeNames_cont = np.array([attributeNames[0],attributeNames[3],attributeNames[4],attributeNames[5], attributeNames[6]])
+
+
+# standardize X_cont (relative to mean and standard deviation)
+Y2 = zscore(X_cont, ddof=1)
+
+N2, M2 = X_cont.shape
+
+
+
+# Try histogram for all variables
 figure(figsize=(8,7))
 u = np.floor(np.sqrt(M)); v = np.ceil(float(M)/u)
 for i in range(M):
@@ -21,16 +34,16 @@ for i in range(M):
     ylim(0,N/2)
     
 show()
+
 '''
-Seems like age, chol and thalach are normally distributed
+Seems like age, trestrbps, chol and thalach are normally distributed
 '''
 
-# 
 
 # BOXPLOT: for all attributes ################################################
 
 boxplot(X)
-xticks(range(1,9),attributeNames)
+xticks(range(1,10),attributeNames, fontsize=8)
 title('Boxplot for all attributes')
 show()
 
@@ -40,48 +53,35 @@ It can clearly be seen that tje continuous variables are at different scales
 This will be a problem for applying ML algorithms, 
 especially for Classification problems where Euclidian distance is used
 
-
-We will substract the mean and divide by st. dev for the continous variables:
-chol, thalach, oldpeak
-
-Note: Age can be left out of this since we might transform it into a discrete variable
-later - for making a better model - for example we could use bining but this is beyond the scope
-of this project.
-
+We will put replace in X the standardied columns from Y2 (see above) 
+to get a standardized columns for the continuous variables
 '''
-#create matrix of continuous variables: chol, thalach, oldpeak
-X_cont = np.column_stack((X[:,3],X[:,4],X[:,5]))
 
-attributeNames_cont = np.array([attributeNames[3],attributeNames[4],attributeNames[5]])
 
-# standardize X_cont (relative to mean and standard deviation)
-Y2 = zscore(X_cont, ddof=1)
-'''
-another way:
-Y2 = X_cont - np.ones((N, 1))*X_cont.mean(0)
-Y2 = Y2*(1/np.std(Y2,0))
-'''
+# BOXPLOT: only for standardized continuous values + aligned ################################# 
+boxplot(Y2)
+xticks(range(1,6),attributeNames_cont)
+title('Boxplot for Standardized Continuous Values')
+show()
+
+
+
+X_stand = X
 
 # Replace standardized columns into X
-X_stand = X
-X_stand[:,3] = Y2[:,0]
-X_stand[:,4] = Y2[:,1]
-X_stand[:,5] = Y2[:,2]
-X_stand = np.delete(X_stand,0,1)
+X_stand[:,0] = Y2[:,0]
+X_stand[:,3] = Y2[:,1]
+X_stand[:,4] = Y2[:,2]
+X_stand[:,5] = Y2[:,3]
+X_stand[:,6] = Y2[:,4]
 
-attributeNames_ageexcl = np.delete(attributeNames,0) 
 
-# BOXPLOT: for all attributes EXCEPT AGE: standardized to check for outliers:
+# BOXPLOT: all X dataset, with standardized continuous attributes:
 boxplot(X_stand)
-xticks(range(1,9),attributeNames_ageexcl)
+xticks(range(1,10),attributeNames, fontsize=8)
 title('Boxplot to check for outliers (with standardized cont. values)')
 show()
 
-# BOXPLOT FOR STANARDIZED CONTINOUS VALUES ################################# 
-boxplot(Y2)
-xticks(range(1,4),attributeNames_cont)
-title('Boxplot for Standardized Continuous Values')
-show()
 
 '''
 Looks better now. WE SHOULD DISCUSS WHICH OUTLIERS TO REMOVE
@@ -107,11 +107,6 @@ show()
 
 #SCATTERPLOT for continuous values ############################################
 
-# X_cont2: has age, chol, thalach and oldpeak - not normalized
-X_cont2 = np.column_stack((X[:,0],X_cont))
-attributeNames_cont2 = np.array(['age','chol', 'thalach', 'oldpeak'])
-N2, M2 = X_cont2.shape
-
 # Scatterplots:
 figure(figsize=(12,10))
 for m1 in range(M2): #loops through attributes - x direction
@@ -120,21 +115,22 @@ for m1 in range(M2): #loops through attributes - x direction
         #loops through classes:
         for c in range(C):
             class_mask = (y==c)
-            plot(np.array(X_cont2[class_mask,m2]), np.array(X_cont2[class_mask,m1]), '.', alpha=.5)
+            plot(np.array(X_cont[class_mask,m2]), np.array(X_cont[class_mask,m1]), '.', alpha=.5)
       
             #LABELS:
             if m1==M2-1: #makes labels when 1st axis
-                xlabel(attributeNames_cont2[m2])
+                xlabel(attributeNames_cont[m2])
             else:
                 xticks([])
             if m2==0: #makes labels for y axis
-                ylabel(attributeNames_cont2[m1])
+                ylabel(attributeNames_cont[m1])
             else:
                 yticks([])
 
 legend(classNames)
 
 show()
+
 
 # 3D PLOT ###################################################################
 # Choice: age, chol and thalach
@@ -146,30 +142,21 @@ f = figure()
 ax = f.add_subplot(111, projection='3d')
 for c in range(C):
     class_mask = (y==c)
-    s = ax.scatter(X_cont2[class_mask,ind[0]], X_cont2[class_mask,ind[1]], X_cont2[class_mask,ind[2]], c=colors[c])
+    s = ax.scatter(X_cont[class_mask,ind[0]], X_cont[class_mask,ind[1]], X_cont[class_mask,ind[2]], c=colors[c])
 
 ax.view_init(30, 220)
-ax.set_xlabel(attributeNames_cont2[ind[0]])
-ax.set_ylabel(attributeNames_cont2[ind[1]])
-ax.set_zlabel(attributeNames_cont2[ind[2]])
+ax.set_xlabel(attributeNames_cont[ind[0]])
+ax.set_ylabel(attributeNames_cont[ind[1]])
+ax.set_zlabel(attributeNames_cont[ind[2]])
 
 show()
 
 # MATRIX PLOT ###############################################################
 
-# Uses standardized matrix of continous values: !Note: age is also standardized
-Y2_2 = zscore(X_cont2, ddof=1)
-
-# Replace standardized columns into X
-X_stand2 = X
-X_stand2[:,0] = Y2_2[:,0]
-X_stand2[:,3] = Y2_2[:,1]
-X_stand2[:,4] = Y2_2[:,2]
-X_stand2[:,5] = Y2_2[:,3]
 
 figure(figsize=(12,6))
-imshow(X_stand2, interpolation='none', aspect=(8./N), cmap=cm.gray);
-xticks(range(8), attributeNames)
+imshow(X_stand, interpolation='none', aspect=(8./N), cmap=cm.gray);
+xticks(range(9), attributeNames)
 xlabel('Attributes')
 ylabel('Data objects')
 title('Heart Attack Possibility: Data Matrix')
