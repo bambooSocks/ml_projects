@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from main import *
+from continuous_data import *
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,39 +10,34 @@ from scipy.stats import zscore
 
 # DATA VIZUALIZATION ###############################################
 
-# create matrix of continuous variables: age, trestbps, chol, thalach, oldpeak
-X_cont = np.column_stack((X[:, 0], X[:, 3], X[:, 4], X[:, 5], X[:, 6]))
 
-attributeNames_cont = np.array([attributeNames[0], attributeNames[3], attributeNames[4],
-                                attributeNames[5], attributeNames[6]])
-
-# standardize X_cont (relative to mean and standard deviation)
-Y2 = zscore(X_cont, ddof=1)
-
-N2, M2 = X_cont.shape
 
 # Try histogram for all variables
-plt.figure(figsize=(8, 7))
-u = np.floor(np.sqrt(M))
-v = np.ceil(float(M)/u)
+figure(figsize=(8,7))
+u = np.floor(np.sqrt(M)); v = np.ceil(float(M)/u)
 for i in range(M):
-    plt.subplot(u, v, i+1)
-    plt.hist(X[:, i], color=(0.1, 0.8-i*0.1, 0.4))
-    plt.xlabel(attributeNames[i])
-    plt.ylim(0, N/2)
+    subplot(u,v,i+1)
+    hist(X[:,i], color=(0.2, 0.9-i*0.1, 0.4))
+    xlabel(attributeNames[i])
+    ylim(0,N/2)
     
-plt.show()
+show()
+
 
 '''
 Seems like age, trestrbps, chol and thalach are normally distributed
 '''
 
-
 # BOXPLOT: for all attributes ################################################
+
+plt.boxplot(X_wo)
+plt.xticks(range(1, 10), attributeNames_wo, fontsize=8)
+plt.title('Boxplot with outliers')
+plt.show()
 
 plt.boxplot(X)
 plt.xticks(range(1, 10), attributeNames, fontsize=8)
-plt.title('Boxplot for all attributes')
+plt.title('Boxplot without outliers')
 plt.show()
 
 '''
@@ -50,40 +46,71 @@ It can clearly be seen that tje continuous variables are at different scales
 This will be a problem for applying ML algorithms, 
 especially for Classification problems where Euclidian distance is used
 
-We will put replace in X the standardied columns from Y2 (see above) 
-to get a standardized columns for the continuous variables
+In order to see the outliers more clearly we have extracted the continuos
+attributes including outliers in X_cont_wo
+Those attributes are: age, trestbps, chol, thalach, oldpeak
 '''
+# create matrix of continuous variables: 
+X_cont_wo = np.column_stack((X_wo[:, 0], X_wo[:, 3], X_wo[:, 4], X_wo[:, 5], X_wo[:, 6]))
 
+# standardize X_cont (relative to mean and standard deviation)
+Y2_wo = zscore(X_cont_wo, ddof=1)
 
-# BOXPLOT: only for standardized continuous values + aligned ################################# 
-plt.boxplot(Y2)
-plt.xticks(range(1, 6), attributeNames_cont)
-plt.title('Boxplot for Standardized Continuous Values')
-plt.show()
+N2, M2 = X_cont_wo.shape
 
-X_stand = X
+# Replace in X_wo the columns with standardized attrbiutes
+X_stand_wo = X_wo
 
 # Replace standardized columns into X
-X_stand[:, 0] = Y2[:, 0]
-X_stand[:, 3] = Y2[:, 1]
-X_stand[:, 4] = Y2[:, 2]
-X_stand[:, 5] = Y2[:, 3]
-X_stand[:, 6] = Y2[:, 4]
+X_stand_wo[:, 0] = Y2_wo[:, 0]
+X_stand_wo[:, 3] = Y2_wo[:, 1]
+X_stand_wo[:, 4] = Y2_wo[:, 2]
+X_stand_wo[:, 5] = Y2_wo[:, 3]
+X_stand_wo[:, 6] = Y2_wo[:, 4]
 
+'''
+Now we make a couple of boxplots for better understanding of our data
+'''
 
 # BOXPLOT: all X dataset, with standardized continuous attributes:
-plt.boxplot(X_stand)
-plt.xticks(range(1, 10), attributeNames, fontsize=8)
+plt.boxplot(X_stand_wo)
+plt.xticks(range(1, 10), attributeNames_wo, fontsize=8)
 plt.title('Boxplot to check for outliers (with standardized cont. values)')
 plt.show()
 
 
+Y2 = zscore(X_cont, ddof=1)
+
+# BOXPLOT: only for standardized continuous values + aligned ################################# 
+plt.boxplot(Y2_wo)
+plt.xticks(range(1, 6), attributeNames_cont)
+plt.title('Boxplot for Standardized Continuous Values - with outliers')
+plt.show()
+
+plt.boxplot(Y2)
+plt.xticks(range(1, 6), attributeNames_cont)
+plt.title('Boxplot for Standardized Continuous Values - without outliers')
+plt.show()
+
+
 '''
-Looks better now. WE SHOULD DISCUSS WHICH OUTLIERS TO REMOVE
+From here on we work only with data without outliers:
+    - Filtration is based on the quantiles (check main) -
+- Data matrix X
+    - contains both discrete and continous values, without outliers. 
+    attributes: 'age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak',
+       'slope', 'thal'
+- Data matrix X_cont
+    - contains only continuous values, without outliers
+    attributes: 'age', 'trestbps', 'chol', 'thalach', 'oldpeak'
+- Y2: standardized matrix of X_cont
+
 '''
 
+N2, M2 = X_cont.shape
+
 # BOXPLOT based on each class #################################################
-# more chance/ less chance of heart attack
+# more chance/ less chance of heart attack 
 # Also aligned on the same axis for better comparison
 
 plt.figure(figsize=(14,7))
@@ -153,8 +180,8 @@ plt.show()
 
 
 plt.figure(figsize=(12,6))
-plt.imshow(X_stand, interpolation='none', aspect=(8./N), cmap=plt.cm.gray)
-plt.xticks(range(9), attributeNames)
+plt.imshow(Y2, interpolation='none', aspect=(8./N), cmap=plt.cm.gray)
+plt.xticks(range(5), attributeNames)
 plt.xlabel('Attributes')
 plt.ylabel('Data objects')
 plt.title('Heart Attack Possibility: Data Matrix')
