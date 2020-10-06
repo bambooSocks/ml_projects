@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import svd
-from continuous_data import *
+from data_aquisition import *
 
 
 Y = (X_cont - np.ones((N_cont, 1)) * X_cont.mean(axis=0)) / X_cont.std(axis=0)

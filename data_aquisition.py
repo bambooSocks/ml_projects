@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 df = pd.read_csv("heart.csv")
 
@@ -6,12 +7,13 @@ X_wo = df[:-1].to_numpy()
 
 y_attr = 'target'
 cont_attr = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-sel_attr = ['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope', 'thal']
+sel_attr = ['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope']
 
 X_sel_wo = df[sel_attr].to_numpy()
+X_cont_wo = df[cont_attr].to_numpy()
 
-# Removing outliers (based on box plots from data_visualization)
-for col in df.columns:
+# Removing outliers from selected variables (based on box plots from data_visualization)
+for col in sel_attr:
     Q1 = df[col].quantile(0.25)
     Q3 = df[col].quantile(0.75)
     IQR = Q3 - Q1    # IQR is interquartile range.
