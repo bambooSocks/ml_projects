@@ -199,7 +199,7 @@ plt.show()
 
 plt.figure(figsize=(12, 6))
 plt.imshow(Y2, interpolation='none', aspect=(8./N), cmap=plt.cm.gray)
-plt.xticks(range(1, len(cont_attr)+1), cont_attr)
+plt.xticks(range(len(cont_attr)), cont_attr)
 plt.xlabel('Attributes')
 plt.ylabel('Data objects')
 plt.title('Heart Attack Possibility: Data Matrix')
