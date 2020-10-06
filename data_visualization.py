@@ -70,7 +70,8 @@ attributes including outliers in X_cont_wo
 Those attributes are: age, trestbps, chol, thalach, oldpeak
 '''
 # create matrix of continuous variables: 
-X_cont_wo = np.column_stack((X_wo[:, 0], X_wo[:, 3], X_wo[:, 4], X_wo[:, 5], X_wo[:, 6]))
+X_cont_wo = np.column_stack((X_sel_wo[:, 0], X_sel_wo[:, 3], X_sel_wo[:, 4], X_sel_wo[:, 5], X_sel_wo[:, 6]))
+
 
 # standardize X_cont (relative to mean and standard deviation)
 Y2_wo = zscore(X_cont_wo, ddof=1)
@@ -78,7 +79,7 @@ Y2_wo = zscore(X_cont_wo, ddof=1)
 N2, M2 = X_cont_wo.shape
 
 # Replace in X_wo the columns with standardized attributes
-X_stand_wo = X_wo
+X_stand_wo = X_sel_wo
 
 # Replace standardized columns into X
 X_stand_wo[:, 0] = Y2_wo[:, 0]
@@ -93,7 +94,7 @@ Now we make a couple of boxplots for better understanding of our data
 
 # BOXPLOT: all X dataset, with standardized continuous attributes:
 plt.boxplot(X_stand_wo)
-plt.xticks(range(1, len(attr)+1), attr, fontsize=8)
+plt.xticks(range(1, len(sel_attr)+1), sel_attr, fontsize=8)
 plt.title('Boxplot to check for outliers (with standardized cont. values)')
 plt.show()
 
