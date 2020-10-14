@@ -42,7 +42,7 @@ Includes:
 
 The principal component analysis helped with analysing of which the continuous attributes contribute the most to the data variation. The results also show that if the focus would be only on the 90% of the variance the set of continuous attributes of size 5 can be shrunk into a set of 4 principal components, hence limiting the amount of attributes. Lastly the correlation of the two most significant principal components showed a slight tendency of the pc1 component to predict the target however the definite result is not clear.
 
-### Conclusion:
+### Conclusion for Part I:
 
 Overall the the primary machine learning aim appears to be feasible. The data selected might be suitable for applying a classification model - this is also supported by previous analysis of the data. One could thus predict the heart attack possibility based on those attributes, although the validation of the model is
 yet to be discussed in Part II.
