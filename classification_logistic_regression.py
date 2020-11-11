@@ -31,13 +31,15 @@ for i in order:
 print("Most important feature ranking which should be considered for a future model is:", feature_ranks)
 
 '''
-Most important features ranking: ['5. chol', '3. cp', '1. age', '7. oldpeak', '8. slope', '6. thalach', '2. sex', '4. trestbps']    
+Most important features ranking: ['5. chol', '3. cp', '1. age', '7. oldpeak', '8. slope', '6. thalach', '2. sex', '4. trestbps']
+This hierarchy also makes sense according to the correlation matrix.    
 However for this project we will use all attributes and use a regularization term to control complexity.
 Performance of different models (ANN, CT, KNN, NB) will be analyzed afterwards.
 '''
 # We treat thalach as categorical. since we do not know which angina pain type is worse (typical or atypical)
 
-# One out of hot encoding:
+
+# One out of hot encoding ######################################################
 enc = OneHotEncoder()
 # we get our discrete variables: sex, cp, slope
 X_discrete = np.stack((X_sel[:,1],X_sel[:,2],X_sel[:,7]),axis=-1)
@@ -51,13 +53,25 @@ attributeNames = np.array(['age','trestbps', 'chol', 'thalach', 'oldpeak',
        'no_cp','asymptomatic_cp','slope_up','slope_flat','slope_down'], dtype='<U8')
 N, M = X.shape
 
+# Selecting based on RFE (cut half the attibutes) : age, chol, oldpeak, cp (typical, atyipical, no cp)
+X_simple = np.column_stack((X_sel[:,0],X_sel[:,4],X[:,6],X_enc[:,2:5]))
+attributeNames_simple = np.array(['age','chol', 'oldpeak',
+       'typical_cp','atypical_cp',
+       'no_cp','asymptomatic_cp'], dtype='<U8')
 
-# Crossvalidation partition for evaluation
+
+# Crossvalidation partition for evaluation #####################################
 # using stratification and 95 pct. split between training and test 
+# alternating between X/ X_simple
+'''
+The model was applies on both X and X_simple (where half of the attributes are cute off based on importance)
+However when using X_simple the minimum test error is even higher. So we will model based on all attributes for now.
+'''
 K = 10 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.95, stratify=y, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.95, stratify=y, random_state=0) 
 
 # we have set a seed so results are reproducible (random_state=0)
+#choose between X and X_simple
 
 # Standardize the training and test set based on training set mean and std
 mu = np.mean(X_train, 0)
@@ -70,7 +84,11 @@ lambda_interval = np.logspace(-8, 5, 50)
 train_error_rate = np.zeros(len(lambda_interval))
 test_error_rate = np.zeros(len(lambda_interval))
 coefficient_norm = np.zeros(len(lambda_interval))
+
+# Select based on whether X or X_simple is used
 coefficient_matrix = np.zeros((len(lambda_interval),15))
+#coefficient_matrix = np.zeros((len(lambda_interval),7)) #uncomment this is you wish to use X_simple
+
 for k in range(0, len(lambda_interval)):
     #regularization regression - L2
     mdl = LogisticRegression(penalty='l2', C=1/lambda_interval[k] )
@@ -126,6 +144,7 @@ plt.show()
 Note: 
 As one can see, the minimum test error is 26.49% which is quite high.
 This is due to the fact that we have used all the attributes and only the regularization term for controlling model complexity. 
+We have tried cutting off the attributes based on their importance (have used the REF package). However the training error is way worse. 
 This means our model will classify y correctly about 1/4 times. 
 
 '''
