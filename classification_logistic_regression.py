@@ -80,14 +80,15 @@ sigma = np.std(X_train, 0)
 X_train = (X_train - mu) / sigma
 X_test = (X_test - mu) / sigma
 
-lambda_interval = np.logspace(-8, 5, 50)
+lambda_interval = np.power(10.,range(-5,9))
 train_error_rate = np.zeros(len(lambda_interval))
 test_error_rate = np.zeros(len(lambda_interval))
 coefficient_norm = np.zeros(len(lambda_interval))
 
-# Select based on whether X or X_simple is used
-coefficient_matrix = np.zeros((len(lambda_interval),15))
-#coefficient_matrix = np.zeros((len(lambda_interval),7)) #uncomment this is you wish to use X_simple
+# Select based on whether X or X_simple is used: 15 = X.shape[1] +1
+s = X.shape[1] +1
+# s = X_simple.shape[1] +1
+coefficient_matrix = np.zeros((len(lambda_interval),s))
 
 for k in range(0, len(lambda_interval)):
     #regularization regression - L2
@@ -108,8 +109,8 @@ for k in range(0, len(lambda_interval)):
     coefficient_matrix[k,:] = coef_vector
 
 min_error = np.min(test_error_rate)
-opt_lambda_idx = np.argmin(test_error_rate) #26
-opt_wieghts = coefficient_matrix[26,:]
+opt_lambda_idx = np.argmin(test_error_rate) 
+opt_wieghts = coefficient_matrix[opt_lambda_idx,:]
 #  array([ 0.99453237,  0.72318361,  0.68650974,  0.61346421,  1.58205608,
 #       -2.04352359,  1.92511527, -1.92511527, -1.2582287 ,  0.00290383,
 #       -0.97304672,  2.50443067, -0.01087359, -0.28967932,  0.29834006])
