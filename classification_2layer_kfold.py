@@ -40,7 +40,7 @@ N, M = X.shape
 K = 10
 
 # Values of lambda
-lambdas = np.power(10.,range(-5,4))
+lambdas = np.logspace(-7, 2, 50)
 
 lambdas_vect = np.empty((K,1))
 Error_train_rlr = np.empty((K,1))
@@ -49,6 +49,7 @@ mu = np.empty((K, M-1))
 sigma = np.empty((K, M-1))
 s=X.shape[1] +1
 coefficient_matrix = np.zeros((K,s))
+models_lr = [] #list to store the best model after each outer cv-fold
 
 k=0
 for train_index, test_index in CV2.split(X,y):
@@ -74,6 +75,7 @@ for train_index, test_index in CV2.split(X,y):
 
 
     mdl2 = LogisticRegression(penalty='l2', C=1/opt_lambda )
+    models_lr.append(mdl2)
     
     mdl2.fit(X_train, y_train)
 
@@ -92,28 +94,35 @@ for train_index, test_index in CV2.split(X,y):
         
     print('Please wait: Outer cross validation fold {0}/{1}...'.format(k+1,K))
     # Display the results for the last cross-validation fold
-    if k == K-1:
+    if k == 5: #we take the fold according to the found out optimal index (opt_idx)
         plt.figure(figsize=(8,8))
         #plt.figure(k, figsize=(12,8))
-        title('Classification error for last cv-fold with lambda: 1e{0}'.format(np.log10(opt_lambda)))        
+        title('Classification error for best cv-fold with lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))        
         plt.semilogx(opt_lambda, opt_val_err, color='cyan', markersize=12, marker='o')
-        plt.text(1e-4, 2.5e-1, "Minimum test error: " + str(round(opt_val_err*100,2)) + ' % at optimal lambda: 1e{0}'.format(np.log10(opt_lambda)))
-        loglog(lambdas,train_err_vs_lambda.T,'b.-',lambdas,test_err_vs_lambda.T,'r.-')
+        plt.text(1e-6, 2.0e-1, "Minimum test error: " + str(round(opt_val_err*100,2)) + ' % at optimal lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))
+        loglog(lambdas,train_err_vs_lambda.T,'b-',lambdas,test_err_vs_lambda.T,'r-')
         xlabel('Regularization factor')
         ylabel('Error rate - last inner fold')
         legend(['Test minimum','Training error','Validation error'])
-        grid()
-    
+        grid()    
     
     k+=1
     
 min_error = np.min(Error_test_rlr)
-opt_lambda_idx = np.argmin(Error_test_rlr)
-# ModelI_lr =    
+opt_idx = np.argmin(Error_test_rlr)
+best_LR_model = models_lr[opt_idx]
+# LogisticRegression(C=0.44984326689694437)
+best_lambda = lambdas_vect[opt_idx]
 
-print("Training errors are", Error_train_rlr)
-print("Testing errors are", Error_test_rlr)
+
+print("Training errors are", np.round(Error_train_rlr,2))
+print("Testing errors are", np.round(Error_test_rlr,2))
 print("Lambdas are", lambdas_vect)
-print("Weights for the optimal model are:", coefficient_matrix[opt_lambda_idx,:])
+print("Weights for the optimal model are: \n", coefficient_matrix[opt_idx,:])
+array_best_lambda = np.round(np.log10(best_lambda),2)
+print("Minimum test error: " + str(np.round(min_error*100,2)) + ' % at 1e' + str(array_best_lambda[0]))
+
+'''
 print("Minimum test error is " + str(np.round(min_error*100,2)) + "%")
-print("with optimal regularization strength",lambdas_vect[opt_lambda_idx])
+print("with optimal regularization strength",best_lambda[0])
+'''

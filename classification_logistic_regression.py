@@ -80,7 +80,7 @@ sigma = np.std(X_train, 0)
 X_train = (X_train - mu) / sigma
 X_test = (X_test - mu) / sigma
 
-lambda_interval = np.power(10.,range(-5,9))
+lambda_interval = np.logspace(-7, 2, 50)
 train_error_rate = np.zeros(len(lambda_interval))
 test_error_rate = np.zeros(len(lambda_interval))
 coefficient_norm = np.zeros(len(lambda_interval))
@@ -122,7 +122,7 @@ plt.figure(figsize=(8,8))
 plt.semilogx(lambda_interval, train_error_rate*100)
 plt.semilogx(lambda_interval, test_error_rate*100)
 plt.semilogx(opt_lambda, min_error*100, 'o')
-plt.text(1e-8, 5, "Minimum test error: " + str(np.round(min_error*100,2)) + ' % at 1e' + str(np.round(np.log10(opt_lambda),2)))
+plt.text(1e-6, 20, "Minimum test error: " + str(np.round(min_error*100,2)) + ' % at 1e' + str(np.round(np.log10(opt_lambda),2)))
 plt.xlabel('Regularization strength, $\log_{10}(\lambda)$')
 plt.ylabel('Error rate (%)')
 plt.title('Classification error')
@@ -139,7 +139,9 @@ plt.ylabel('L2 Norm')
 plt.xlabel('Regularization strength, $\log_{10}(\lambda)$')
 plt.title('Parameter vector L2 norm')
 plt.grid()
-plt.show()    
+plt.show() 
+
+print("Minimum test error: " + str(np.round(min_error*100,2)) + ' % at 1e' + str(np.round(np.log10(opt_lambda),2)))   
 
 '''
 Note: 
