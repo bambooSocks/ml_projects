@@ -9,6 +9,7 @@ from toolbox_02450.statistics import *
 from sklearn.linear_model import LogisticRegression
 from toolbox_02450 import train_neural_net
 import torch
+import concurrent
 from CV_split import * #makes sure splitting is only computed once
 
 
@@ -31,7 +32,7 @@ def network_validate_classification(X,y,h_interval):
     
     cvf = 10
     n_replicates = 3
-    max_iter = 10000
+    max_iter = 3000 #this is lower due to computation time
     M = X.shape[1]
     error_rate_matrix = np.empty((cvf,len(h_interval)))
 
@@ -86,6 +87,34 @@ def network_validate_classification(X,y,h_interval):
     return opt_val_err, opt_n_h_units
         
     
+def rgr_validate_per_fold(train_index, test_index, X, y, lambdas, train_error, test_error, f):
+    X_train = X[train_index]
+    y_train = y[train_index]
+    X_test = X[test_index]
+    y_test = y[test_index]
+    
+    # Standardize the training and set set based on training set moments
+    mu = np.mean(X_train[:, 1:], 0)
+    sigma = np.std(X_train[:, 1:], 0)
+    
+    X_train[:, 1:] = (X_train[:, 1:] - mu) / sigma
+    X_test[:, 1:] = (X_test[:, 1:] - mu) / sigma
+    
+    # precompute terms
+
+    for l in range(0,len(lambdas)):
+
+        mdl = LogisticRegression(penalty='l2', C=1/lambdas[l], max_iter=10000 )
+        
+        mdl.fit(X_train, y_train)
+        
+        y_train_est = mdl.predict(X_train).T
+        y_test_est = mdl.predict(X_test).T
+        
+        train_error[f,l] = np.sum(y_train_est != y_train) / len(y_train)
+        test_error[f,l] = np.sum(y_test_est != y_test) / len(y_test)
+        
+    return train_error, test_error
 
 
 def rgr_validate(X,y,lambdas):
@@ -114,34 +143,12 @@ def rgr_validate(X,y,lambdas):
     test_error = np.empty((cvf,len(lambdas)))
     f = 0
     y = y.squeeze()
-    for train_index, test_index in CV1.split(X,y):
-        X_train = X[train_index]
-        y_train = y[train_index]
-        X_test = X[test_index]
-        y_test = y[test_index]
-        
-        # Standardize the training and set set based on training set moments
-        mu = np.mean(X_train[:, 1:], 0)
-        sigma = np.std(X_train[:, 1:], 0)
-        
-        X_train[:, 1:] = (X_train[:, 1:] - mu) / sigma
-        X_test[:, 1:] = (X_test[:, 1:] - mu) / sigma
-        
-        # precompute terms
-
-        for l in range(0,len(lambdas)):
-
-            mdl = LogisticRegression(penalty='l2', C=1/lambdas[l] )
-            
-            mdl.fit(X_train, y_train)
-            
-            y_train_est = mdl.predict(X_train).T
-            y_test_est = mdl.predict(X_test).T
-            
-            train_error[f,l] = np.sum(y_train_est != y_train) / len(y_train)
-            test_error[f,l] = np.sum(y_test_est != y_test) / len(y_test)
-    
-        f=f+1
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for train_index, test_index in CV1.split(X,y):
+            future = executor.submit(rgr_validate_per_fold, train_index, test_index, X, y, lambdas, train_error, test_error, f)
+            train_error, test_error = future.result()
+            f=f+1
+            print('Inner cross validation fold {0}/{1}...'.format(f,cvf))
 
     opt_val_err = np.min(np.mean(test_error,axis=0))
 
