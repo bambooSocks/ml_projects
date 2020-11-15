@@ -35,7 +35,7 @@ y = y_m.reshape((282,1))
 C = 2
 
 # Normalize data
-X = stats.zscore(X);
+X = stats.zscore(X)
 
 ### ANN ##########################################################################
 # Parameters for neural network classifier
