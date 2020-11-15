@@ -42,6 +42,8 @@ lambdas = np.logspace(-2, 2, 50)
 lambdas_vect = np.empty((K,1))
 Error_train_rlr = np.empty((K,1))
 Error_test_rlr = np.empty((K,1))
+Error_train_nofeatures = np.empty((K,1))
+Error_test_nofeatures = np.empty((K,1))
 mu = np.empty((K, M-1))
 sigma = np.empty((K, M-1))
 s=X.shape[1] +1
@@ -68,8 +70,11 @@ for train_index, test_index in CV2.split(X,y):
     sigma[k, :] = np.std(X_train[:, 1:], 0)
     
     X_train[:, 1:] = (X_train[:, 1:] - mu[k, :] ) / sigma[k, :] 
-    X_test[:, 1:] = (X_test[:, 1:] - mu[k, :] ) / sigma[k, :] 
-    
+    X_test[:, 1:] = (X_test[:, 1:] - mu[k, :] ) / sigma[k, :]
+
+    # Compute mean squared error without using the input data at all
+    Error_train_nofeatures[k] = np.sum(y_train != np.bincount(y_train).argmax())/y_train.shape[0]
+    Error_test_nofeatures[k] = np.sum(y_train != np.bincount(y_test).argmax())/y_test.shape[0]
 
     #@ignore_warnings(category = ConvergenceWarning)
     mdl2 = LogisticRegression(penalty='l2', C=1/opt_lambda, max_iter=10000 )
@@ -84,7 +89,7 @@ for train_index, test_index in CV2.split(X,y):
     Error_train_rlr[k] = np.sum(y_train != y_tr_est)/y_train.shape[0]
     Error_test_rlr[k] = np.sum(y_test != y_tst_est)/y_test.shape[0]
     lambdas_vect[k] = opt_lambda
-    
+
     # magnitude of the coefficients - add in coeff matrix
     w_est = mdl2.coef_[0] 
     coef_vector = np.concatenate((mdl2.intercept_,np.squeeze(mdl2.coef_)))
@@ -119,6 +124,13 @@ print("Lambdas are", lambdas_vect)
 print("Weights for the optimal model are: \n", coefficient_matrix[opt_idx,:])
 array_best_lambda = np.round(np.log10(best_lambda),2)
 print("Minimum test error: " + str(np.round(min_error*100,2)) + ' % at 1e' + str(array_best_lambda[0]))
+
+print('Regularized linear regression:')
+print('- Training error: {0}'.format(Error_train_rlr.mean()))
+print('- Test error:     {0}'.format(Error_test_rlr.mean()))
+print('- R^2 train:     {0}'.format((Error_train_nofeatures.sum()-Error_train_rlr.sum())/Error_train_nofeatures.sum()))
+print('- R^2 test:     {0}\n'.format((Error_test_nofeatures.sum()-Error_test_rlr.sum())/Error_test_nofeatures.sum()))
+
 
 '''
 print("Minimum test error is " + str(np.round(min_error*100,2)) + "%")

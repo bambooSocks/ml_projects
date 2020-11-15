@@ -223,3 +223,69 @@ def rlr_validate(X, y, lambdas, cvf=10):
     mean_w_vs_lambda = np.squeeze(np.mean(w, axis=1))
 
     return opt_val_err, opt_lambda, mean_w_vs_lambda, train_err_vs_lambda, test_err_vs_lambda
+
+
+def network_validate_regression(X, y, h_interval):
+    ''' Validate neural network model using 'cvf'-fold cross validation.
+        Finds the optimal hidden units from the hidden unit list
+        Function returns: optimal test error value, optimal number of hidden units, optimal model after each fold
+
+        Parameters:
+        X       training data set
+        y       vector of values
+        h_interval the interval of hidden units. Should start consecutively. Eg: [1,2,3..]
+
+        Returns:
+        opt_val_err         validation error for optimum lambda
+        opt_n_h_units       optimal number of hidden units
+    '''
+
+    cvf = 10
+    n_replicates = 3
+    max_iter = 3000  # this is lower due to computation time
+    M = X.shape[1]
+    error_rate_matrix = np.empty((cvf, len(h_interval)))
+
+    for k, (train_index, test_index) in enumerate(CV4.split(X, y)):
+        print('\nCrossvalidation inner fold: {0}/{1}'.format(k + 1, 10))
+
+        for h in range(0, len(h_interval)):
+            print("NO OF HIDDEN UNITS:", h + 1)
+            model = lambda: torch.nn.Sequential(
+                torch.nn.Linear(M, h + 1),  # M features to H hiden units - h+1 since h starts with 0
+                torch.nn.Tanh(),  # 1st transfer function,
+                torch.nn.Linear(h + 1, 1),  # H hidden units to 1 output neuron
+                 # no final tranfer function
+            )
+
+            loss_fn = torch.nn.MSELoss()
+            # Extract training and test set for current CV fold, convert to tensors
+            X_train = torch.Tensor(X[train_index, :])
+            y_train = torch.Tensor(y[train_index])
+            X_test = torch.Tensor(X[test_index, :])
+            y_test = torch.Tensor(y[test_index])
+
+            # Train the net on training data
+            net, final_loss, learning_curve = train_neural_net(model,
+                                                               loss_fn,
+                                                               X=X_train,
+                                                               y=y_train,
+                                                               n_replicates=n_replicates,
+                                                               max_iter=max_iter)
+
+            # Determine estimated class labels for test set
+            y_test_est = net(X_test)
+
+            # Determine errors and errors
+            se = (y_test_est.float() - y_test.float()) ** 2  # squared error
+            mse = (sum(se).type(torch.float) / len(y_test)).data.numpy()  # mean
+            error_rate_matrix[k, h] = mse
+
+            print('\n\tBest loss for h= {}: {}\n'.format(h, final_loss))
+
+    opt_index = np.argmin(np.mean(error_rate_matrix, axis=0))
+    opt_val_err = np.min(np.mean(error_rate_matrix, axis=0))
+    opt_n_h_units = h_interval[opt_index]
+    print("errors are", np.mean(error_rate_matrix, axis=0))
+    print("hidden unit index is", np.argmin(np.mean(error_rate_matrix, axis=0)))
+    return opt_val_err, opt_n_h_units
