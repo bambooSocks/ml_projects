@@ -14,7 +14,7 @@ Created on Sat Nov 14 19:41:58 2020
 
 from sklearn import model_selection
 
-cvf = 10
+cvf = 3
 K = 10
 # splitting is done using stratified fold so classes are equally balanced
 # inner cross-validation:

@@ -39,8 +39,8 @@ if do_pca_preprocessing:
 
 K = 10
 h_interval = np.array([1, 2, 3, 4, 5])
-max_iter = 3
-n_replicates = 50 #this is lower due to computation time
+max_iter = 10000 #this has to be as high as possible to make a good prediction, however it takes longer computation time
+n_replicates = 1 #due to computation time
 
 errors = []   # a list for storing generalizaition error after each outer cv-fold
 h_optimal_list = []     # a list for storing optimal hidden units no after each outer cv-fold
@@ -53,7 +53,7 @@ color_list = ['tab:orange', 'tab:green', 'tab:purple', 'tab:brown', 'tab:pink',
               'tab:gray', 'tab:olive', 'tab:cyan', 'tab:red', 'tab:blue']
 
 opt_val_err, opt_n_h_units = network_validate_regression(X, y, h_interval)
-'''
+
 
 for k, (train_index, test_index) in enumerate(CV4.split(X, y)):
     print('\nCROSSVALIDATION OUTER FOLD: {0}/{1}'.format(k + 1, K))
@@ -150,5 +150,4 @@ print("With ptimal hidden units for each fold: ", h_optimal_list)
 #print('\nEstimated generalization error, RMSE: {0}'.format(round(np.sqrt(np.mean(errors)), 4)))
 print("Optimal test error is {}% with no of hidden units {}".format(np.round(opt_val_err * 100, 2), opt_n_h_units))
 
-'''
 

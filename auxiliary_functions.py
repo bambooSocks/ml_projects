@@ -9,6 +9,7 @@ from toolbox_02450.statistics import *
 from sklearn.linear_model import LogisticRegression
 from toolbox_02450 import train_neural_net
 import torch
+from scipy.stats import stats
 import concurrent
 from CV_split import * #makes sure splitting is only computed once
 
@@ -241,8 +242,8 @@ def network_validate_regression(X, y, h_interval):
     '''
 
     cvf = 10
-    n_replicates = 3
-    max_iter = 50  # this is lower due to computation time
+    n_replicates = 1 #due to computation time
+    max_iter = 2000  # this has to be adjusted. Has to be set to a high no if we want a good prediction
     M = X.shape[1]
     error_rate_matrix = np.empty((cvf, len(h_interval)))
 
@@ -275,6 +276,7 @@ def network_validate_regression(X, y, h_interval):
 
             # Determine estimated class labels for test set
             y_test_est = net(X_test)
+           # y_test = stats.zscore(y_test.data.numpy())
 
             # Determine errors and errors
             se = (y_test_est.float() - y_test.float()) ** 2  # squared error
@@ -286,6 +288,4 @@ def network_validate_regression(X, y, h_interval):
     opt_index = np.argmin(np.mean(error_rate_matrix, axis=0))
     opt_val_err = np.min(np.mean(error_rate_matrix, axis=0))
     opt_n_h_units = h_interval[opt_index]
-    print("errors are", np.mean(error_rate_matrix, axis=0))
-    print("hidden unit index is", np.argmin(np.mean(error_rate_matrix, axis=0)))
     return opt_val_err, opt_n_h_units
