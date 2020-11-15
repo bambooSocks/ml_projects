@@ -14,7 +14,6 @@ enc.fit(X_discrete)
 X_enc = enc.transform(X_discrete).toarray()
 # stack on top of the continuous ones
 y = X_cont[:,3].T
-y = stats.zscore(y)
 y_label = "thalach"
 X_cont = np.delete(X_cont, 3, axis=1)
 X = np.column_stack((X_cont, X_enc))
