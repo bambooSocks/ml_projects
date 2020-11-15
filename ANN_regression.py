@@ -33,7 +33,7 @@ h_interval = np.array([1, 2, 3, 4, 5])
 max_iter = 3
 n_replicates = 50 #this is lower due to computation time
 
-errors = np.empty((K, 1))   # a list for storing generalizaition error after each outer cv-fold
+errors = []   # a list for storing generalizaition error after each outer cv-fold
 h_optimal_list = []     # a list for storing optimal hidden units no after each outer cv-fold
 ANN_best_models = []    # a list for models for storing models after each outer cv-fold
 
@@ -78,17 +78,22 @@ for k, (train_index, test_index) in enumerate(CV4.split(X, y)):
     y_test_est = net(X_test)
 
     # Determine errors and errors
-    y_test = y_test.type(dtype=torch.uint8)
+    se = (y_test_est.float() - y_test.float()) ** 2  # squared error
+    mse = (sum(se).type(torch.float) / len(y_test)).data.numpy()  # mean
+    errors.append(mse)  # store error rate for current CV fold
 
-    e = y_test_est != y_test
-    error_rate = (sum(e).type(torch.float) / len(y_test)).data.numpy()
-    errors[k] = error_rate  # store error rate for current CV fold
+    # # Determine errors and errors
+    # y_test = y_test.type(dtype=torch.uint8)
+    #
+    # e = y_test_est != y_test
+    # error_rate = (sum(e).type(torch.float) / len(y_test)).data.numpy()
+    # errors[k] = error_rate  # store error rate for current CV fold
     h_optimal_list.append(opt_n_h_units)
     ANN_best_models.append(net)
 
     # Display the learning curve for the best net in the current fold
     h, = summaries_axes[0].plot(learning_curve, color=color_list[k])
-    h.set_label('CV fold {0}'.format(k + 1))
+    h.set_label('CV fold {0}'.format(k+1))
     summaries_axes[0].set_xlabel('Iterations')
     summaries_axes[0].set_xlim((0, max_iter))
     summaries_axes[0].set_ylabel('Loss')
