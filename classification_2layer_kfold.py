@@ -6,11 +6,8 @@ Created on Fri Nov 13 15:27:51 2020
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.io import loadmat
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import OneHotEncoder
-from sklearn import model_selection
 from matplotlib.pylab import (figure, semilogx, loglog, xlabel, ylabel, legend, 
                            title, subplot, show, grid)
 
@@ -40,7 +37,7 @@ N, M = X.shape
 K = 10
 
 # Values of lambda
-lambdas = np.logspace(-7, 2, 50)
+lambdas = np.logspace(-2, 2, 50)
 
 lambdas_vect = np.empty((K,1))
 Error_train_rlr = np.empty((K,1))
@@ -60,6 +57,7 @@ for train_index, test_index in CV2.split(X,y):
     X_test = X[test_index]
     y_test = y[test_index]
     
+    print('Please wait: Outer cross validation fold {0}/{1}...'.format(k+1,K))
     #rgr_validate does the inner cross-validation with cvf=10
     opt_val_err, opt_lambda, train_err_vs_lambda, test_err_vs_lambda = rgr_validate(X_train, y_train, lambdas)
 
@@ -73,8 +71,8 @@ for train_index, test_index in CV2.split(X,y):
     X_test[:, 1:] = (X_test[:, 1:] - mu[k, :] ) / sigma[k, :] 
     
 
-
-    mdl2 = LogisticRegression(penalty='l2', C=1/opt_lambda )
+    #@ignore_warnings(category = ConvergenceWarning)
+    mdl2 = LogisticRegression(penalty='l2', C=1/opt_lambda, max_iter=10000 )
     models_lr.append(mdl2)
     
     mdl2.fit(X_train, y_train)
@@ -92,14 +90,14 @@ for train_index, test_index in CV2.split(X,y):
     coef_vector = np.concatenate((mdl2.intercept_,np.squeeze(mdl2.coef_)))
     coefficient_matrix[k,:] = coef_vector
         
-    print('Please wait: Outer cross validation fold {0}/{1}...'.format(k+1,K))
+   
     # Display the results for the last cross-validation fold
     if k == 5: #we take the fold according to the found out optimal index (opt_idx)
         plt.figure(figsize=(8,8))
         #plt.figure(k, figsize=(12,8))
         title('Classification error for best cv-fold with lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))        
         plt.semilogx(opt_lambda, opt_val_err, color='cyan', markersize=12, marker='o')
-        plt.text(1e-6, 2.0e-1, "Minimum test error: " + str(round(opt_val_err*100,2)) + ' % at optimal lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))
+        plt.text(1e-2, 2.0e-1, "Minimum test error: " + str(round(opt_val_err*100,2)) + ' % at optimal lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))
         loglog(lambdas,train_err_vs_lambda.T,'b-',lambdas,test_err_vs_lambda.T,'r-')
         xlabel('Regularization factor')
         ylabel('Error rate - last inner fold')

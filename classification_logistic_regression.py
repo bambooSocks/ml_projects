@@ -1,45 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.io import loadmat
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from toolbox_02450 import rocplot, confmatplot
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.feature_selection import RFE
+from auxiliary_functions import rgr_validate
 
 from data_aquisition import *
 
-# Removing thal from dataset (as discussed in previous report)
-attributeNames = np.delete(sel_attr, -1, axis=0)
-# ['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope']
-
-X = np.delete(X_sel, -1, axis=1)
-
-# We select use the RFE package to recursively select the features of most importance:
-
-
-logreg = LogisticRegression(fit_intercept = False)
-logreg.fit(X,y)
-selector = RFE(logreg, n_features_to_select=1)
-selector = selector.fit(X, y)
-order = selector.ranking_
-print(order)
-
-feature_ranks = []
-for i in order:
-    feature_ranks.append(f"{i}. {attributeNames[i-1]}")
-print("Most important feature ranking which should be considered for a future model is:", feature_ranks)
-
-'''
-Most important features ranking: ['5. chol', '3. cp', '1. age', '7. oldpeak', '8. slope', '6. thalach', '2. sex', '4. trestbps']
-This hierarchy also makes sense according to the correlation matrix.    
-However for this project we will use all attributes and use a regularization term to control complexity.
-Performance of different models (ANN, CT, KNN, NB) will be analyzed afterwards.
-'''
-# We treat thalach as categorical. since we do not know which angina pain type is worse (typical or atypical)
-
-
-# One out of hot encoding ######################################################
+## Data Prepping ###########################################################################
 enc = OneHotEncoder()
 # we get our discrete variables: sex, cp, slope
 X_discrete = np.stack((X_sel[:,1],X_sel[:,2],X_sel[:,7]),axis=-1)
@@ -53,96 +19,25 @@ attributeNames = np.array(['age','trestbps', 'chol', 'thalach', 'oldpeak',
        'no_cp','asymptomatic_cp','slope_up','slope_flat','slope_down'], dtype='<U8')
 N, M = X.shape
 
-# Selecting based on RFE (cut half the attibutes) : age, chol, oldpeak, cp (typical, atyipical, no cp)
-X_simple = np.column_stack((X_sel[:,0],X_sel[:,4],X[:,6],X_enc[:,2:5]))
-attributeNames_simple = np.array(['age','chol', 'oldpeak',
-       'typical_cp','atypical_cp',
-       'no_cp','asymptomatic_cp'], dtype='<U8')
+lambdas = np.logspace(-2, 3, 50)
 
+opt_val_err, opt_lambda, train_err_vs_lambda, test_err_vs_lambda = rgr_validate(X, y, lambdas)
 
-# Crossvalidation partition for evaluation #####################################
-# using stratification and 95 pct. split between training and test 
-# alternating between X/ X_simple
-'''
-The model was applies on both X and X_simple (where half of the attributes are cute off based on importance)
-However when using X_simple the minimum test error is even higher. So we will model based on all attributes for now.
-'''
-K = 10 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.95, stratify=y, random_state=0) 
-
-# we have set a seed so results are reproducible (random_state=0)
-#choose between X and X_simple
-
-# Standardize the training and test set based on training set mean and std
-mu = np.mean(X_train, 0)
-sigma = np.std(X_train, 0)
-
-X_train = (X_train - mu) / sigma
-X_test = (X_test - mu) / sigma
-
-lambda_interval = np.logspace(-7, 2, 50)
-train_error_rate = np.zeros(len(lambda_interval))
-test_error_rate = np.zeros(len(lambda_interval))
-coefficient_norm = np.zeros(len(lambda_interval))
-
-# Select based on whether X or X_simple is used: 15 = X.shape[1] +1
-s = X.shape[1] +1
-# s = X_simple.shape[1] +1
-coefficient_matrix = np.zeros((len(lambda_interval),s))
-
-for k in range(0, len(lambda_interval)):
-    #regularization regression - L2
-    mdl = LogisticRegression(penalty='l2', C=1/lambda_interval[k] )
-    
-    mdl.fit(X_train, y_train)
-
-    y_train_est = mdl.predict(X_train).T
-    y_test_est = mdl.predict(X_test).T
-    
-    train_error_rate[k] = np.sum(y_train_est != y_train) / len(y_train)
-    test_error_rate[k] = np.sum(y_test_est != y_test) / len(y_test)
-
-# magnitude of the coefficients
-    w_est = mdl.coef_[0] 
-    coefficient_norm[k] = np.sqrt(np.sum(w_est**2))
-    coef_vector = np.concatenate((mdl.intercept_,np.squeeze(mdl.coef_)))
-    coefficient_matrix[k,:] = coef_vector
-
-min_error = np.min(test_error_rate)
-opt_lambda_idx = np.argmin(test_error_rate) 
-opt_wieghts = coefficient_matrix[opt_lambda_idx,:]
-#  array([ 0.99453237,  0.72318361,  0.68650974,  0.61346421,  1.58205608,
-#       -2.04352359,  1.92511527, -1.92511527, -1.2582287 ,  0.00290383,
-#       -0.97304672,  2.50443067, -0.01087359, -0.28967932,  0.29834006])
-opt_lambda = lambda_interval[opt_lambda_idx]
-
-# 0.07906043210907701
 
 plt.figure(figsize=(8,8))
-plt.semilogx(lambda_interval, train_error_rate*100)
-plt.semilogx(lambda_interval, test_error_rate*100)
-plt.semilogx(opt_lambda, min_error*100, 'o')
-plt.text(1e-6, 20, "Minimum test error: " + str(np.round(min_error*100,2)) + ' % at 1e' + str(np.round(np.log10(opt_lambda),2)))
-plt.xlabel('Regularization strength, $\log_{10}(\lambda)$')
-plt.ylabel('Error rate (%)')
-plt.title('Classification error')
-plt.legend(['Training error','Test error','Test minimum'],loc='upper right')
-plt.ylim([0, 50])
-plt.grid()
-plt.show()    
+plt.title('Classification error for best cv-fold with lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))        
+plt.semilogx(opt_lambda, opt_val_err, color='cyan', markersize=12, marker='o')
+plt.text(1e-2, 2.5e-1, "Minimum test error: " + str(round(opt_val_err*100,2)) + ' % \nat optimal lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))
+plt.loglog(lambdas,train_err_vs_lambda.T,'b-',lambdas,test_err_vs_lambda.T,'r-')
+plt.xlabel('Regularization factor')
+plt.ylabel('Error rate - last inner fold')
+plt.legend(['Test minimum','Training error','Validation error'])
+plt.grid() 
 
 
 #complexity of model decreases as we increase reg. strength lambda
-plt.figure(figsize=(8,8))
-plt.semilogx(lambda_interval, coefficient_norm,'k')
-plt.ylabel('L2 Norm')
-plt.xlabel('Regularization strength, $\log_{10}(\lambda)$')
-plt.title('Parameter vector L2 norm')
-plt.grid()
-plt.show() 
 
-print("Minimum test error: " + str(np.round(min_error*100,2)) + ' % at 1e' + str(np.round(np.log10(opt_lambda),2)))   
-
+print('Classification error for best cv-fold with lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2))) 
 '''
 Note: 
 As one can see, the minimum test error is 26.49% which is quite high.

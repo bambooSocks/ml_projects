@@ -44,7 +44,7 @@ K=10
 
 h_interval = np.array([1,2,3,4,5]) #here is where we define the array of hidden units
 max_iter = 3
-n_replicates = 3
+n_replicates = 3000 #this is lower due to computation time
 
 errors = np.empty((K,1)) # a list for storing generalizaition error after each outer cv-fold
 h_optimal_list = [] # a list for storing optimal hidden units no after each outer cv-fold
@@ -110,7 +110,7 @@ for k, (train_index, test_index) in enumerate(CV2.split(X,y)):
 
 opt_index_2 = np.argmin(errors)
 opt_val_err = np.min(errors)
-opt_n_h_units = h_interval[opt_index_2]
+opt_n_h_units = h_optimal_list[opt_index_2]
 best_ANN_model = ANN_best_models[opt_index_2]
 
 # Display the error rate across folds
