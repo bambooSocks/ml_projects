@@ -74,7 +74,7 @@ for train_index, test_index in CV2.split(X,y):
 
     # Compute mean squared error without using the input data at all
     Error_train_nofeatures[k] = np.sum(y_train != np.bincount(y_train).argmax())/y_train.shape[0]
-    Error_test_nofeatures[k] = np.sum(y_train != np.bincount(y_test).argmax())/y_test.shape[0]
+    Error_test_nofeatures[k] = np.sum(y_test != np.bincount(y_test).argmax())/y_test.shape[0]
 
     #@ignore_warnings(category = ConvergenceWarning)
     mdl2 = LogisticRegression(penalty='l2', C=1/opt_lambda, max_iter=10000 )
@@ -118,21 +118,21 @@ best_LR_model = models_lr[opt_idx]
 best_lambda = lambdas_vect[opt_idx]
 
 
-print("Training errors are", np.round(Error_train_rlr,2))
-print("Testing errors are", np.round(Error_test_rlr,2))
+print("Training errors for LogReg are", np.round(Error_train_rlr,2))
+print("Testing errors for LogReg are", np.round(Error_test_rlr,2))
 print("Lambdas are", lambdas_vect)
 print("Weights for the optimal model are: \n", coefficient_matrix[opt_idx,:])
 array_best_lambda = np.round(np.log10(best_lambda),2)
 print("Minimum test error: " + str(np.round(min_error*100,2)) + ' % at 1e' + str(array_best_lambda[0]))
 
+print()
+
+print("Testing errors for the Base Model are", np.round(Error_test_nofeatures,2))
+
+print()
 print('Regularized linear regression:')
 print('- Training error: {0}'.format(Error_train_rlr.mean()))
 print('- Test error:     {0}'.format(Error_test_rlr.mean()))
 print('- R^2 train:     {0}'.format((Error_train_nofeatures.sum()-Error_train_rlr.sum())/Error_train_nofeatures.sum()))
 print('- R^2 test:     {0}\n'.format((Error_test_nofeatures.sum()-Error_test_rlr.sum())/Error_test_nofeatures.sum()))
 
-
-'''
-print("Minimum test error is " + str(np.round(min_error*100,2)) + "%")
-print("with optimal regularization strength",best_lambda[0])
-'''

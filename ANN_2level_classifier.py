@@ -43,8 +43,8 @@ X = stats.zscore(X);
 K=10 
 
 h_interval = np.array([1,2,3,4,5]) #here is where we define the array of hidden units
-max_iter = 3
-n_replicates = 3000 #this is lower due to computation time
+max_iter = 3000 #this is lower due to computation time
+n_replicates = 3 
 
 errors = np.empty((K,1)) # a list for storing generalizaition error after each outer cv-fold
 h_optimal_list = [] # a list for storing optimal hidden units no after each outer cv-fold
@@ -128,7 +128,4 @@ draw_neural_net(weights, biases, tf, attribute_names=attributeNames)
 
 print("Test errors are: ",errors)
 print("Optimal hidden units for each fold: ",h_optimal_list)
-print("Optimal test error is {}% with no of hidden units {}".format(np.round(opt_val_err*100,2),opt_n_h_units))
-
-
- 
+print("Optimal test error is {}% with no of hidden units {}".format(np.round(opt_val_err*100,2),opt_n_h_units)) 

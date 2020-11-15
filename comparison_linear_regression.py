@@ -1,56 +1,80 @@
-from matplotlib.pyplot import figure, plot, xlabel, ylabel, show
 import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn import model_selection
-import sklearn.tree
-import scipy.stats as st
+from toolbox_02450 import jeffrey_interval
+from toolbox_02450 import mcnemar
 
 from regression_b import *
 from ANN_regression import *
 
+'''
+SETUP I
 
-K = 10
-CV = model_selection.KFold(n_splits=K, shuffle = True, random_state=0) # seed seed value to 0 for same selection
-
-zA = []
-zB = []
+Returning to the post-surgical example, the conclusions we might arrive at under setup I therefore
+have to be stated conditional on D. We might (for instance) find model MA is significantly better
+than MB, but our conclusion can only be said to have been tested (and therefore, be valid) in the
+case the models are trained on D.
+'''
 
 y_est_A = best_regression_model(np.concatenate((np.ones((X.shape[0],1)),X),1))
 y_est_B = best_ANN_model(torch.Tensor(X)).detach().numpy().reshape(X.shape[0])
+y_est_C = y.mean() + np.zeros(y.shape[0])
 
-zA = np.abs(y_test - y_est_A) ** 2
-zB = np.abs(y_test - y_est_B) ** 2
+y_true = np.squeeze(np.asarray(y.reshape(1,282)))
+yhat = np.column_stack((y_est_A, y_est_B, y_est_C))
 
-
-# Code below is used to create a usable matrix from the stacked error vectors for each K-fold
-# Matrix is defined as: Number of calculated errors (size of the training set) x Kfold
-# np.sort and np.shape are used to trim the dyA and dyB matrices, as np.stack creates (train, Kfold, 1) numpy arrays
-# and last 1-dimensional shape is pointless.
-zA = np.reshape(zA, (np.sort(np.shape(zA))[-1], np.sort(np.shape(zA))[-2]))
-zB = np.reshape(zB, (np.sort(np.shape(zB))[-1], np.sort(np.shape(zB))[-2]))
-
-# Compute the mean of all errors across all the K-folds
-zA  = np.mean(zA, axis = 1)
-zB  = np.mean(zB, axis = 1)
-    
+#for LR model choose: yhat[:,0]
+# Compute the Jeffreys interval
 alpha = 0.05
-# compute confidence interval of model A
-CIA = st.t.interval(1-alpha, df=len(zA)-1, loc=np.mean(zA), scale=st.sem(zA))  # Confidence interval
+[thetahatA, CIA] = jeffrey_interval(y_true, yhat[:,0], alpha=alpha)
+print("Theta point estimate for Linear Regression Model", thetahatA, " CI: ", CIA)
 
-# compute confidence interval of model B
-CIB = st.t.interval(1-alpha, df=len(zB)-1, loc=np.mean(zB), scale=st.sem(zB))
+# for ANN Model choose: yhat[:,1]
+[thetahatB, CIB] = jeffrey_interval(y_true, yhat[:,1], alpha=alpha)
 
-# Compute confidence interval of z = zA-zB and p-value of Null hypothesis
-z = zA - zB
-CI = st.t.interval(1-alpha, len(z)-1, loc=np.mean(z), scale=st.sem(z))  # Confidence interval
-p = st.t.cdf( -np.abs( np.mean(z) )/st.sem(z), df=len(z)-1)  # p-value
+print("\nTheta point estimate for ANN Model", thetahatB, " CI: ", CIB)
 
-print("CIA:", CIA)
-print("CIB:", CIB)
-print("Mean estimation (thetaHat):", np.mean(z))
-print("CI:", CI)
-print("p-value:", p)
+# for Base Model choose: yhat[:,2]
+[thetahatC, CIC] = jeffrey_interval(y_true, yhat[:,2], alpha=alpha)
+
+print("\nTheta point estimate for Base Model", thetahatC, " CI: ", CIC)
+
+
+
+#Difference in performance between Linear Regression Model and ANN Model: use McNemar test
+# Compute the Jeffreys interval
+alpha = 0.05
+[thetahat, CI, p] = mcnemar(y_true, yhat[:,0], yhat[:,1], alpha=alpha)
+
+print("\ntheta = theta_LR-theta_ANN point estimate", thetahat, " CI: ", CI, "p-value", p)
 
 '''
-The CI and p value is always changing, since test set and traning set is randomly split. 
+Comparison between Regularized Linear Regression Model and ANN Model:
+    
+CI interval barely doesn’t contain 0, which is weak
+evidence towards MB having a relatively higher accuracy than MA. Meanwhile,
+the p-value is relatively high, indicating the result is likely due to chance. All in
+all the result is inconclusive and we should not conclude MB is better than MA.
+'''
+#Difference in performance between Linear Regression Model and Base Model: use McNemar test
+
+[thetahat, CI, p] = mcnemar(y_true, yhat[:,0], yhat[:,2], alpha=alpha)
+print("\ntheta = theta_LR-theta_Base_Model point estimate", thetahat, " CI: ", CI, "p-value", p)
+
+'''
+Comparison between Regularized Linear Regression Model and Base Model:
+    
+CI doesnøt contain 0, so one can say MC performs slightly better than MA.
+There is a relatively higher difference in performance between
+MA and MC. The performance difference
+θ is estimated to be between (approximately) 0.05 and 0.1. The confidence
+interval is therefore well clear of 0 and the low p-value (p < 0.01) indicates the
+result is not likely to be due to chance.
+'''
+
+#Difference in performance between ANN Model and Base Model: use McNemar test
+
+[thetahat, CI, p] = mcnemar(y_true, yhat[:,1], yhat[:,2], alpha=alpha)
+print("\ntheta = theta_ANN-theta_Base_Model point estimate", thetahat, " CI: ", CI, "p-value", p)
+
+'''
+Comparison between ANN Model and Base Model:
 '''

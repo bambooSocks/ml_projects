@@ -16,7 +16,7 @@ from CV_split import * #makes sure splitting is only computed once
 
 
 def network_validate_classification(X,y,h_interval):
-    ''' Validate neural network model using 'cvf'-fold cross validation.
+    ''' Validate neural network model for classification using 'cvf'-fold cross validation.
         Finds the optimal hidden units from the hidden unit list
         Function returns: optimal test error value, optimal number of hidden units, optimal model after each fold
         
@@ -226,7 +226,7 @@ def rlr_validate(X, y, lambdas, cvf=10):
 
 
 def network_validate_regression(X, y, h_interval):
-    ''' Validate neural network model using 'cvf'-fold cross validation.
+    ''' Validate neural network model for regression using 'cvf'-fold cross validation.
         Finds the optimal hidden units from the hidden unit list
         Function returns: optimal test error value, optimal number of hidden units, optimal model after each fold
 
