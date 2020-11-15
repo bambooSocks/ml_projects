@@ -242,11 +242,11 @@ def network_validate_regression(X, y, h_interval):
 
     cvf = 10
     n_replicates = 3
-    max_iter = 3000  # this is lower due to computation time
+    max_iter = 50  # this is lower due to computation time
     M = X.shape[1]
     error_rate_matrix = np.empty((cvf, len(h_interval)))
 
-    for k, (train_index, test_index) in enumerate(CV4.split(X, y)):
+    for k, (train_index, test_index) in enumerate(CV3.split(X, y)):
         print('\nCrossvalidation inner fold: {0}/{1}'.format(k + 1, 10))
 
         for h in range(0, len(h_interval)):
