@@ -75,8 +75,7 @@ for k, (train_index, test_index) in enumerate(CV4.split(X, y)):
 
     # Determine estimated class labels for test set
     # y predicted
-    y_sigmoid = net(X_test)
-    y_test_est = (y_sigmoid > .5).type(dtype=torch.uint8)  # set tershold to classify as 0 or 1
+    y_test_est = net(X_test)
 
     # Determine errors and errors
     y_test = y_test.type(dtype=torch.uint8)

@@ -3,46 +3,24 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import model_selection
 import sklearn.tree
-import scipy.stats
-import numpy as np, scipy.stats as st
+import scipy.stats as st
 
-# requires data from exercise 5.1.5
-from ex5_1_5 import *
+from regression_b import *
+from ANN_regression import *
 
-X,y = X[:, :10], X[:, 10:]
-# This script crates predictions from three KNN classifiers using cross-validation
 
-K = 16
+K = 10
 CV = model_selection.KFold(n_splits=K, shuffle = True, random_state=0) # seed seed value to 0 for same selection
 
 zA = []
 zB = []
 
-for train_index, test_index in CV.split(X):
-    
-    # extract training and test set for current CV fold
-    X_train = X[train_index,:]
-    y_train = y[train_index]
-    X_test = X[test_index,:]
-    y_test = y[test_index]
+y_est_A = best_regression_model(np.concatenate((np.ones((X.shape[0],1)),X),1))
+y_est_B = best_ANN_model(torch.Tensor(X)).detach().numpy().reshape(X.shape[0])
 
-    # Fit the models
-    mA = sklearn.linear_model.LinearRegression().fit(X_train,y_train)
-    mB = sklearn.tree.DecisionTreeRegressor().fit(X_train, y_train)
+zA = np.abs(y_test - y_est_A) ** 2
+zB = np.abs(y_test - y_est_B) ** 2
 
-    y_est_A = mA.predict(X_test)
-    y_est_B = mB.predict(X_test)[:,np.newaxis]  #  justsklearnthings
-
-    zA_temp = np.abs(y_test - y_est_A ) ** 2 
-    zB_temp = np.abs(y_test - y_est_B ) ** 2
-    
-    zA.append(zA_temp)
-    zB.append(zB_temp)
-    
-
-# From the list that contains all the error vectors for each K-fold, create an array of mean errors acrross the K-folds       
-zA = np.stack(zA, axis=1) 
-zB = np.stack(zB, axis=1)
 
 # Code below is used to create a usable matrix from the stacked error vectors for each K-fold
 # Matrix is defined as: Number of calculated errors (size of the training set) x Kfold
