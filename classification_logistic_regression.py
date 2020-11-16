@@ -19,25 +19,25 @@ attributeNames = np.array(['age','trestbps', 'chol', 'thalach', 'oldpeak',
        'no_cp','asymptomatic_cp','slope_up','slope_flat','slope_down'], dtype='<U8')
 N, M = X.shape
 
-lambdas = np.logspace(-2, 3, 50)
+lambdas = np.logspace(-2, 2, 50)
 
 opt_val_err, opt_lambda, train_err_vs_lambda, test_err_vs_lambda = rgr_validate(X, y, lambdas)
 
+opt_lambda_2 = np.round(opt_lambda,2)
 
 plt.figure(figsize=(8,8))
-plt.title('Classification error for best cv-fold with lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))        
+plt.title('Classification errors plotted against lambda interval')        
 plt.semilogx(opt_lambda, opt_val_err, color='cyan', markersize=12, marker='o')
-plt.text(1e-2, 2.5e-1, "Minimum test error: " + str(round(opt_val_err*100,2)) + ' % \nat optimal lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))
+plt.text(1e-2, 2.5e-1, "Minimum test error: " + str(round(opt_val_err*100,2)) + ' % \nat optimal lambda: {}'.format(opt_lambda_2))
 plt.loglog(lambdas,train_err_vs_lambda.T,'b-',lambdas,test_err_vs_lambda.T,'r-')
 plt.xlabel('Regularization factor')
 plt.ylabel('Error rate - last inner fold')
 plt.legend(['Test minimum','Training error','Validation error'])
 plt.grid() 
 
-
 #complexity of model decreases as we increase reg. strength lambda
 
-print('Classification error for best cv-fold with lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2))) 
+print('Best classification error is {}% with best regularization term: {}'.format(round(opt_val_err*100,2),opt_lambda_2)) 
 '''
 Note: 
 As one can see, the minimum test error is 26.49% which is quite high.

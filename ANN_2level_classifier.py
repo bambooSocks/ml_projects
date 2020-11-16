@@ -43,8 +43,8 @@ X = stats.zscore(X);
 K=10 
 
 h_interval = np.array([1,2,3,4,5]) #here is where we define the array of hidden units
-max_iter = 3000 #this is lower due to computation time
-n_replicates = 3 
+max_iter = 10000 
+n_replicates = 1 #due to computation time
 
 errors = np.empty((K,1)) # a list for storing generalizaition error after each outer cv-fold
 h_optimal_list = [] # a list for storing optimal hidden units no after each outer cv-fold

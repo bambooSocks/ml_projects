@@ -32,8 +32,8 @@ def network_validate_classification(X,y,h_interval):
     '''
     
     cvf = 10
-    n_replicates = 3
-    max_iter = 3000 #this is lower due to computation time
+    n_replicates = 1 #due to computation time
+    max_iter = 10000 
     M = X.shape[1]
     error_rate_matrix = np.empty((cvf,len(h_interval)))
 

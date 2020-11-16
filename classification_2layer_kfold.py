@@ -100,9 +100,9 @@ for train_index, test_index in CV2.split(X,y):
     if k == 5: #we take the fold according to the found out optimal index (opt_idx)
         plt.figure(figsize=(8,8))
         #plt.figure(k, figsize=(12,8))
-        title('Classification error for best cv-fold with lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))        
+        title('Classification error for best cv-fold with lambda: {}'.format(np.round(opt_lambda,2)))        
         plt.semilogx(opt_lambda, opt_val_err, color='cyan', markersize=12, marker='o')
-        plt.text(1e-2, 2.0e-1, "Minimum test error: " + str(round(opt_val_err*100,2)) + ' % at optimal lambda: 1e{0}'.format(np.round(np.log10(opt_lambda),2)))
+        plt.text(1e-2, 1.9e-1, "Minimum test error: " + str(round(opt_val_err*100,2)) + ' % at optimal lambda: {0}'.format(np.round(opt_lambda,2)))
         loglog(lambdas,train_err_vs_lambda.T,'b-',lambdas,test_err_vs_lambda.T,'r-')
         xlabel('Regularization factor')
         ylabel('Error rate - last inner fold')
@@ -115,15 +115,14 @@ min_error = np.min(Error_test_rlr)
 opt_idx = np.argmin(Error_test_rlr)
 best_LR_model = models_lr[opt_idx]
 # LogisticRegression(C=0.44984326689694437)
-best_lambda = lambdas_vect[opt_idx]
+best_lambda = np.round(lambdas_vect[opt_idx],2)
 
 
 print("Training errors for LogReg are", np.round(Error_train_rlr,2))
 print("Testing errors for LogReg are", np.round(Error_test_rlr,2))
-print("Lambdas are", lambdas_vect)
+print("Lambdas are", np.round(lambdas_vect,2))
 print("Weights for the optimal model are: \n", coefficient_matrix[opt_idx,:])
-array_best_lambda = np.round(np.log10(best_lambda),2)
-print("Minimum test error: " + str(np.round(min_error*100,2)) + ' % at 1e' + str(array_best_lambda[0]))
+print("Minimum test error: " + str(np.round(min_error*100,2)) + ' % at ' + str(best_lambda[0]))
 
 print()
 
