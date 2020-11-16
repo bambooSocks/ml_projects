@@ -123,4 +123,4 @@ print("Training errors for regularized model are", np.round(Error_train_rlr, 2))
 print("Testing errors for regularized model are", np.round(Error_test_rlr, 2))
 print("Lambdas are", lambdas_vect)
 
-
+print("Optimal lambda", lambdas_vect[opt_idx])

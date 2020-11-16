@@ -243,7 +243,7 @@ def network_validate_regression(X, y, h_interval):
 
     cvf = 10
     n_replicates = 1 #due to computation time
-    max_iter = 2000  # this has to be adjusted. Has to be set to a high no if we want a good prediction
+    max_iter = 10000  # this has to be adjusted. Has to be set to a high no if we want a good prediction
     M = X.shape[1]
     error_rate_matrix = np.empty((cvf, len(h_interval)))
 

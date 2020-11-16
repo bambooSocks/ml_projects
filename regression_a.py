@@ -46,3 +46,5 @@ plt.show()
 print('Regularized linear regression:')
 print('- Training error: {0}'.format(train_err_vs_lambda.mean()))
 print('- Test error:     {0}'.format(test_err_vs_lambda.mean()))
+
+print(opt_lambda)

@@ -39,7 +39,7 @@ if do_pca_preprocessing:
 
 K = 10
 h_interval = np.array([1, 2, 3, 4, 5])
-max_iter = 10000 #this has to be as high as possible to make a good prediction, however it takes longer computation time
+max_iter = 50000 #this has to be as high as possible to make a good prediction, however it takes longer computation time
 n_replicates = 1 #due to computation time
 
 errors = []   # a list for storing generalizaition error after each outer cv-fold
