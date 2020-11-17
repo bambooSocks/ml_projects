@@ -16,8 +16,8 @@ case the models are trained on D.
 
 y_true = np.squeeze(np.asarray(y.reshape(1,282)))
 
-y_est_A = best_regression_model(np.concatenate((np.ones((X.shape[0],1)),X),1))
-y_est_B = best_ANN_model(torch.Tensor(X)).detach().numpy().reshape(X.shape[0])
+y_est_A = best_regression_model(np.concatenate((np.ones((X.shape[0],1)),stats.zscore(X)),1))
+y_est_B = best_ANN_model(torch.Tensor(stats.zscore(X))).detach().numpy().reshape(X.shape[0])
 y_est_C = y.mean() + np.zeros(y.shape[0])
 
 
