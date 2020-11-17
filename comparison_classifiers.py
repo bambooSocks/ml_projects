@@ -54,12 +54,9 @@ theta = theta_LR-theta_ANN point estimate -0.07801418439716312  CI:  (-0.1290224
 -- INTERPRETATION -- 
 
    
-CI doesnøt contain 0, so one can say MC performs slightly better than MA.
-There is a relatively higher difference in performance between
-MA and MC. The performance difference
-θ is estimated to be between (approximately) 0.05 and 0.1. The confidence
-interval is therefore well clear of 0 and the low p-value (p < 0.01) indicates the
-result is not likely to be due to chance.
+CI does not contain 0 and it is negative. 
+One could say that the Logistic Regression Model performs better than the Neural Network Model.
+The low p-value (p < 0.01) indicates this result is not by chance. 
 
 '''
 #Difference in performance between LOGISTIC Regression Model and Base Model: use McNemar test
@@ -81,7 +78,10 @@ p-value for two-sided test A and B have same accuracy (exact binomial test): p= 
 
 theta = theta_LR-theta_Base_Model point estimate 0.1879432624113475  CI:  (0.13528977757692506, 0.24006879043655105) p-value 1.3280368233066499e-11
 
--- INTERPRETATION --    
+-- INTERPRETATION --   
+CI is positive so this means that there is a clear difference in the performance between the two models.
+The Logistic Regression Model performs better than the Baseline Model (which is expected). 
+The very low p value (p<0.01) indicates that this result is not by chance.  
 
 '''
 
@@ -104,19 +104,21 @@ p-value for two-sided test A and B have same accuracy (exact binomial test): p= 
 
 theta = theta_ANN-theta_Base_Model point estimate 0.26595744680851063  CI:  (0.19484910697897528, 0.33566360845707166) p-value 5.1659499319135495e-12
 
--- INTERPRETATION --    
+-- INTERPRETATION --
+CI is positive, so this means that the ANN Model performs better than the baseline model. 
+This is also confirmed by the low p-value.     
     
 '''
 
 print("REGULARIZED LOGISTIC REGRESSION")
-print("Testing errors for the LogR are \n", np.round(Error_test_rlr,2))
-print("With optimal regularizing parameters: \n", lambdas_vect)
+print("Testing errors for the LogR are \n", np.round(Error_test_rlr*100,2))
+print("With optimal regularizing parameters: \n", np.round(lambdas_vect,2))
 print("LR: Minimum test error: " + str(np.round(min_error*100,2)) + ' % with lambda ' + str(best_lambda[0]))
 
 print()
 
 print("NEURAL NETWORK MODEL")
-print("Error rates for ANN model are: \n",np.round(errors,2))
+print("Error rates for ANN model are: \n",np.round(errors*100,2))
 print("Optimal hidden units for each fold: \n",h_optimal_list)
 print("Optimal test error is {}% with no of hidden units {}".format(np.round(opt_val_err*100,2),opt_n_h_units))
 
@@ -124,4 +126,13 @@ print()
 
 print("BASE MODEL")
 print("Testing errors for the Base Model are \n", np.round(Error_test_nofeatures,2))
+
+'''
+Conclusion: Overall both Logistic Regression Model and the Artificial Neural Network Model perform better than the baseline model.
+This means that those classifiers are quite efficient at predicting the target value, Log Regression predicts the target right about 92% of the time
+and Neural Networl Model predicts the target right about 80% of the time.   
+Performance is quite good for both of them, but when it comes to selecting the best model, one should choose the Regularized Logistic Regression model.
+Since we are doing the comparison using Setup I, SETUP I the conclusions we might arrive at is only conditional to this particular dataset. 
+                                           
+'''
 
