@@ -6,7 +6,7 @@ The overall aim of the project is to analyse the possibility of heart attack bas
 (source: https://www.kaggle.com/nareshbhat/health-care-data-set-on-heart-attack-possibility?fbclid=IwAR1GzOnSDjH10OLucbRHZrvSSesKWnK1IkdzEboQQg-gSXMy-SKtnxzD5j4 )
 The  observations  consist  of  an  individual  patients  and  their  medical  records  as  attributes.  The dimensions of the data set are therefore 303x14 (NxM). Based on Part I of Data Analysis only a subset has been used: various Machine Learning Models have been applied in (Part II ) order to predict certain variables. 
 
-## Part I: :
+## Part I (Data Analysis):
 
 The objective of this report is to apply methods regarding: processing of data, feature extraction, PCA and Data visualization, in order to get a basic understanding of the data prior to the further analysis which will follow in Part II. 
 
@@ -47,7 +47,7 @@ The principal component analysis helped with analysing of which the continuous a
 Overall the the primary machine learning aim appears to be feasible. The data selected might be suitable for applying a classification model - this is also supported by previous analysis of the data. One could thus predict the heart attack possibility based on those attributes, although the validation of the model is
 yet to be discussed in Part II. The subset of the data chosen includes all the continous variables and three discrete ones (['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope']. y is *target* - represents the chance of heart attack.
 
-## Part II:
+## Part II (Applying Machine Learning Models)
 The ML models have been used for different purposes and the complexity parameters have been chosen based on 2-level 10-fold cross validation systems:
 * Predicting the continuous variable for cholesterol (chol). y is *chol* and *thalach* gets included in X. Continuous variables are standardized and one-of-hot encoding is applied to discrete variables. 
 ** Regularized Linear Regression using regularization term to ccontrol model complexity (regression_b.py)
