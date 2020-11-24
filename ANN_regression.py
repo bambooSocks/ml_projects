@@ -16,9 +16,11 @@ enc.fit(X_discrete)
 X_enc = enc.transform(X_discrete).toarray()
 # stack on top of the continuous ones
 y = X_cont[:,3].T
+y = stats.zscore(y)
 y_label = "thalach"
 X_cont = np.delete(X_cont, 3, axis=1)
 X = np.column_stack((X_cont, X_enc))
+
 N, M = X.shape
 attributeNames = np.array(['age', 'trestbps', 'chol', 'oldpeak',
                            'female', 'male', 'typical_cp', 'atypical_cp',
@@ -39,7 +41,7 @@ if do_pca_preprocessing:
 
 K = 10
 h_interval = np.array([1, 2, 3, 4, 5])
-max_iter = 50000 #this has to be as high as possible to make a good prediction, however it takes longer computation time
+max_iter = 10000 #this has to be as high as possible to make a good prediction, however it takes longer computation time
 n_replicates = 1 #due to computation time
 
 errors = []   # a list for storing generalizaition error after each outer cv-fold

@@ -216,8 +216,11 @@ def rlr_validate(X, y, lambdas, cvf=10):
 
         f = f + 1
         print("fold {}/{}".format(f, cvf))
+    idx = np.argmin(np.mean(test_error, axis=0))
     opt_val_err = np.min(np.mean(test_error, axis=0))
     opt_lambda = lambdas[np.argmin(np.mean(test_error, axis=0))]
+    weights = np.round(np.mean((w[:,0:10,idx]),axis=1),2)
+    print(weights)
     train_err_vs_lambda = np.mean(train_error, axis=0)
     test_err_vs_lambda = np.mean(test_error, axis=0)
     mean_w_vs_lambda = np.squeeze(np.mean(w, axis=1))

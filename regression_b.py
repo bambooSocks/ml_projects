@@ -14,13 +14,14 @@ enc.fit(X_discrete)
 X_enc = enc.transform(X_discrete).toarray()
 # stack on top of the continuous ones
 y = X_cont[:,3].T
+y = stats.zscore(y)
 y_label = "thalach"
 X_cont = np.delete(X_cont, 3, axis=1)
 X = np.column_stack((X_cont, X_enc))
 # Add offset attribute
-X_lr = np.concatenate((np.ones((X.shape[0],1)),X),1)
-N, M = X_lr.shape
-attributeNames_lr = np.array(['Offset', 'age', 'trestbps', 'chol', 'oldpeak',
+X = np.concatenate((np.ones((X.shape[0],1)),X),1)
+N, M = X.shape
+attributeNames = np.array(['Offset', 'age', 'trestbps', 'chol', 'oldpeak',
                            'female', 'male', 'typical_cp', 'atypical_cp',
                            'no_cp', 'asymptomatic_cp', 'slope_up', 'slope_flat', 'slope_down', 'target0', 'target1'],
                           dtype='<U8')
@@ -41,12 +42,12 @@ sigma = np.empty((K, M - 1))
 # w_noreg = np.empty((M, K))
 
 k = 0
-for train_index, test_index in CV4.split(X_lr, y):
+for train_index, test_index in CV4.split(X, y):
 
     # extract training and test set for current CV fold
-    X_train = X_lr[train_index]
+    X_train = X[train_index]
     y_train = y[train_index]
-    X_test = X_lr[test_index]
+    X_test = X[test_index]
     y_test = y[test_index]
     internal_cross_validation = 10
 
