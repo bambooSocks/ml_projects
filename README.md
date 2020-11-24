@@ -4,7 +4,7 @@
 ## Purpose
 The overall aim of the project is to analyse the possibility of heart attack based on the chosen Heart  Disease  Data  Set  obtained  by  Cleveland  Clinic Foundation.
 (source: https://www.kaggle.com/nareshbhat/health-care-data-set-on-heart-attack-possibility?fbclid=IwAR1GzOnSDjH10OLucbRHZrvSSesKWnK1IkdzEboQQg-gSXMy-SKtnxzD5j4 )
-The  observations  consist  of  an  individual  patients  and  their  medical  records  as  attributes.   The attributes used for analysis are limited to the recommended 14 attributes by the source of the data set andthere are together 303 observations.  The dimensions of the data set are therefore 303x14 (NxM).
+The  observations  consist  of  an  individual  patients  and  their  medical  records  as  attributes.  The dimensions of the data set are therefore 303x14 (NxM). Based on Part I of Data Analysis only a subset has been used: various Machine Learning Models have been applied in (Part II ) order to predict certain variables. 
 
 ## Part I: :
 
@@ -45,6 +45,18 @@ The principal component analysis helped with analysing of which the continuous a
 ### Conclusion for Part I:
 
 Overall the the primary machine learning aim appears to be feasible. The data selected might be suitable for applying a classification model - this is also supported by previous analysis of the data. One could thus predict the heart attack possibility based on those attributes, although the validation of the model is
-yet to be discussed in Part II.
+yet to be discussed in Part II. The subset of the data chosen includes all the continous variables and three discrete ones (['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope']. y is *target* represents the chance of heart attack.
 
+## Part II:
+The ML models have been used for different purposes and the complexity parameters have been chosen based on 2-level 10-fold cross validation systems:
+* Predicting the continuous variable for cholesterol (chol). y is *chol* and *thalach* gets included in X. Continuous variables are standardized and one-of-hot encoding is applied to discrete variables. 
+** Regularized Linear Regression using regularization term to ccontrol model complexity (regression_b.py)
+** Aritifical Neural Network (ANN): number of hidden units was selected through cross validation (ANN_regression.py)
+** Pariwise Model Comparison using baseline model as reference (comparison_linear_regression.py)
 
+* Calssification: Predicting the chance of heart attack (*target*): 
+** Regularized Logistic Regression: using regularization term to ccontrol model complexity (logistic_regression_2layer_kfold.py)
+** ANN: number of hidden units was selected through cross validation (ANN_2level_classifier.py)
+** Pariwise Model Comparison using baseline model as reference (comparison_classifiers.py)
+
+Note: Classification models are more efficient than the linear regression models.
