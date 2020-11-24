@@ -45,7 +45,7 @@ The principal component analysis helped with analysing of which the continuous a
 ### Conclusion for Part I:
 
 Overall the the primary machine learning aim appears to be feasible. The data selected might be suitable for applying a classification model - this is also supported by previous analysis of the data. One could thus predict the heart attack possibility based on those attributes, although the validation of the model is
-yet to be discussed in Part II. The subset of the data chosen includes all the continous variables and three discrete ones (['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope']. y is *target* represents the chance of heart attack.
+yet to be discussed in Part II. The subset of the data chosen includes all the continous variables and three discrete ones (['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope']. y is *target* - represents the chance of heart attack.
 
 ## Part II:
 The ML models have been used for different purposes and the complexity parameters have been chosen based on 2-level 10-fold cross validation systems:
