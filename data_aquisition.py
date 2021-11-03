@@ -7,7 +7,7 @@ X_wo = df[:-1].to_numpy()
 
 y_attr = 'target'
 cont_attr = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-sel_attr = ['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope']
+sel_attr = ['age', 'sex', 'cp', 'trestbps', 'chol', 'thalach', 'oldpeak', 'slope', 'thal']
 
 X_sel_wo = df[sel_attr].to_numpy()
 X_cont_wo = df[cont_attr].to_numpy()
